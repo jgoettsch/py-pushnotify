@@ -1,0 +1,10 @@
+syntax: regexp
+(^|/)\..*
+
+syntax: glob
+*.egg-info
+*.orig
+*.pyc
+*.sqlite
+build
+dist
