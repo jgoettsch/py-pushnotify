@@ -10,6 +10,11 @@ information.
 
 import urllib
 import urllib2
+try:
+    from xml.etree import cElementTree
+    ElementTree = cElementTree
+except ImportError:
+    from xml.etree import ElementTree
 
 
 PUBLIC_API_URL = u'https://www.notifymyandroid.com/publicapi'
@@ -45,6 +50,11 @@ class Client(object):
         """
 
         self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
+        self._last_type = None
+        self._last_code = None
+        self._last_message = None
+        self._last_remaining = None
+        self._last_resettimer = None
 
         self.apikeys = [] if apikeys is None else apikeys
         self.developerkey = developerkey
@@ -56,6 +66,27 @@ class Client(object):
         response = response_stream.read()
 
         return response
+
+    def _parse_response(self, xmlresp):
+
+        root = ElementTree.fromstring(xmlresp)
+
+        self._last_type = root[0].tag.lower()
+        self._last_code = root[0].attrib['code']
+
+        if self._last_type == 'success':
+            self._last_message = None
+            self._last_remaining = root[0].attrib['remaining']
+            self._last_resettimer = root[0].attrib['resettimer']
+        elif self._last_type == 'error':
+            self._last_message = root[0].text
+            self._last_remaining = None
+            self._last_resettimer = None
+        else:
+            pass
+            # TODO: throw an UnrecognizedResponse exception or something
+
+        return root
 
     def _post(self, url, data):
 
@@ -86,6 +117,11 @@ class Client(object):
                     used while displaying the notification.
                 (default: None)
 
+        Returns:
+            A boolean containing True of the notifications were sent
+            successfully, and False if they were not. For multiple API
+            keys, only return False if they all failed.
+
         """
 
         data = {'apikey': ','.join(self.apikeys),
@@ -101,7 +137,10 @@ class Client(object):
 
         data = urllib.urlencode(data)
 
-        return self._post(NOTIFY_URL, data)
+        response = self._post(NOTIFY_URL, data)
+        self._parse_response(response)
+
+        return self._last_code == '200'
 
     def verify(self, apikey):
         """Verify an API key.
@@ -114,14 +153,18 @@ class Client(object):
             urllib2.URLError
 
         Returns:
-            A string containing the XML from the verify call.
+            A boolean containing True if the API key is valid, and False
+            if it is not.
 
         """
 
         querystring = urllib.urlencode({'apikey': apikey})
         url = '?'.join([VERIFY_URL, querystring])
 
-        return self._get(url)
+        response = self._get(url)
+        self._parse_response(response)
+
+        return self._last_code == '200'
 
 if __name__ == '__main__':
     pass
