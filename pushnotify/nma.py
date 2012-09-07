@@ -57,8 +57,16 @@ class Client(object):
 
         return response
 
+    def _post(self, url, data):
+
+        request = urllib2.Request(url, data)
+        response_stream = self._browser.open(request)
+        response = response_stream.read()
+
+        return response
+
     def notify(self, app, event, desc, kwargs=None):
-        """Send a notification.
+        """Send a notification to each apikey in self.apikeys.
 
         Args:
             app: A string containing the name of the application sending
@@ -80,7 +88,20 @@ class Client(object):
 
         """
 
-        pass
+        data = {'apikey': ','.join(self.apikeys),
+                'application': app,
+                'event': event,
+                'description': desc}
+
+        if self.developerkey:
+            data['developerkey'] = self.developerkey
+
+        if kwargs:
+            data.update(kwargs)
+
+        data = urllib.urlencode(data)
+
+        return self._post(NOTIFY_URL, data)
 
     def verify(self, apikey):
         """Verify an API key.
@@ -91,6 +112,9 @@ class Client(object):
         Raises:
             urllib2.HTTPError
             urllib2.URLError
+
+        Returns:
+            A string containing the XML from the verify call.
 
         """
 
