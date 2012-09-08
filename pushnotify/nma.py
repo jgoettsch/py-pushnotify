@@ -118,7 +118,7 @@ class Client(object):
                 (default: None)
 
         Returns:
-            A boolean containing True of the notifications were sent
+            A boolean containing True if the notifications were sent
             successfully, and False if they were not. For multiple API
             keys, only return False if they all failed.
 
