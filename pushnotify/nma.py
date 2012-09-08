@@ -16,26 +16,22 @@ try:
 except ImportError:
     from xml.etree import ElementTree
 
+from pushnotify import exceptions
+
 
 PUBLIC_API_URL = u'https://www.notifymyandroid.com/publicapi'
 VERIFY_URL = u'/'.join([PUBLIC_API_URL, 'verify'])
 NOTIFY_URL = u'/'.join([PUBLIC_API_URL, 'notify'])
 
-LIMITS = {
-    u'apikey': 48,
-    u'application': 256,
-    u'event': 1000,
-    u'description': 10000,
-    u'developerkey': 48,
-    u'url': 2000}
-
 
 class Client(object):
-    """Client for the Notify My Android applications.
+    """Client for sending push notificiations to Android devices with
+    the Notify My Android application installed.
 
     Member Vars:
-        apikeys: A list of strings, each containing a valid api key.
-        developerkey: A string containing a valid developer key.
+        apikeys: A list of strings, each containing a 48 character api
+            key.
+        developerkey: A string containing a 48 character developer key.
 
     """
 
@@ -67,7 +63,7 @@ class Client(object):
 
         return response
 
-    def _parse_response(self, xmlresp):
+    def _parse_response(self, xmlresp, verify=False):
 
         root = ElementTree.fromstring(xmlresp)
 
@@ -82,11 +78,32 @@ class Client(object):
             self._last_message = root[0].text
             self._last_remaining = None
             self._last_resettimer = None
+
+            if (not verify or
+                    (self._last_code != '400' and self._last_code != '401')):
+                self._raise_exception()
         else:
-            pass
-            # TODO: throw an UnrecognizedResponse exception or something
+            raise exceptions.UnrecognizedResponseError(xmlresp, -1)
 
         return root
+
+    def _raise_exception(self):
+
+        if self._last_code == '400':
+            raise exceptions.FormatError(self._last_message,
+                                         int(self._last_code))
+        elif self._last_code == '401':
+            raise exceptions.ApiKeyError(self._last_message,
+                                         int(self._last_code))
+        elif self._last_code == '402':
+            raise exceptions.RateLimitExceeded(self._last_message,
+                                               int(self._last_code))
+        elif self._last_code == '500':
+            raise exceptions.ServerError(self._last_message,
+                                         int(self._last_code))
+        else:
+            raise exceptions.UnknownError(self._last_message,
+                                          int(self._last_code))
 
     def _post(self, url, data):
 
@@ -100,27 +117,32 @@ class Client(object):
         """Send a notification to each apikey in self.apikeys.
 
         Args:
-            app: A string containing the name of the application sending
-                the notification.
-            event: A string containing the event that is being notified
-                (subject or brief description.)
-            desc: A string containing the notification text.
+            app: A string of up to 256 characters containing the name
+                of the application sending the notification.
+            event: A string of up to 1000 characters containing the
+                event that is being notified (i.e. subject or brief
+                description.)
+            desc: A string of up to 10000 characters containing the
+                notification text.
             kwargs: A dictionary with any of the following strings as
                     keys:
                 priority: An integer between -2 and 2, indicating the
                     priority of the notification. -2 is the lowest, 2 is
                     the highest, and 0 is normal.
-                url: A string containing a URL to attach to the
-                    notification.
+                url: A string of up to 2000 characters containing a URL
+                    to attach to the notification.
                 content_type: A string containing "text/html" (without
                     the quotes) that then allows some basic HTML to be
                     used while displaying the notification.
                 (default: None)
 
-        Returns:
-            A boolean containing True if the notifications were sent
-            successfully, and False if they were not. For multiple API
-            keys, only return False if they all failed.
+        Raises:
+            pushnotify.exceptions.FormatError
+            pushnotify.exceptions.ApiKeyError
+            pushnotify.exceptions.RateLimitExceeded
+            pushnotify.exceptions.ServerError
+            pushnotify.exceptions.UnknownError
+            pushnotify.exceptions.UnrecognizedResponseError
 
         """
 
@@ -140,17 +162,17 @@ class Client(object):
         response = self._post(NOTIFY_URL, data)
         self._parse_response(response)
 
-        return self._last_code == '200'
-
     def verify(self, apikey):
         """Verify an API key.
 
         Args:
-            apikey: A string containing a valid API key.
+            apikey: A string of 48 characters containing an API key.
 
         Raises:
-            urllib2.HTTPError
-            urllib2.URLError
+            pushnotify.exceptions.RateLimitExceeded
+            pushnotify.exceptions.ServerError
+            pushnotify.exceptions.UnknownError
+            pushnotify.exceptions.UnrecognizedResponseError
 
         Returns:
             A boolean containing True if the API key is valid, and False
@@ -162,7 +184,7 @@ class Client(object):
         url = '?'.join([VERIFY_URL, querystring])
 
         response = self._get(url)
-        self._parse_response(response)
+        self._parse_response(response, True)
 
         return self._last_code == '200'
 

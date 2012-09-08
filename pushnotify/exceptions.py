@@ -6,8 +6,8 @@ class PushNotifyError(Exception):
     """Base exception for all pushnotify errors.
 
     Args:
-        args[0]: A string containing a message from the server.
-        args[1]: An integer containing an error code from the server.
+        args[0]: A string containing a message.
+        args[1]: An integer containing an error.
 
     """
 
@@ -82,8 +82,8 @@ class UnrecognizedResponseError(PushNotifyError):
     response.
 
     Args:
-        args[0]: A string containing a message from the server.
-        args[1]: An integer containing an error code from the server.
+        args[0]: A string containing the response from the server.
+        args[1]: -1.
 
     """
 
