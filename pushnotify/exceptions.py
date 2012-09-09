@@ -16,8 +16,8 @@ class PushNotifyError(Exception):
         self.args = [arg for arg in args]
 
 
-class FormatError(PushNotifyError):
-    """Raised when a request is not in the expected format.
+class ApiKeyError(PushNotifyError):
+    """Raised when a provided API key is invalid
 
     Args:
         args[0]: A string containing a message from the server.
@@ -28,8 +28,8 @@ class FormatError(PushNotifyError):
     pass
 
 
-class ApiKeyError(PushNotifyError):
-    """Raised when a provided API key is invalid
+class FormatError(PushNotifyError):
+    """Raised when a request is not in the expected format.
 
     Args:
         args[0]: A string containing a message from the server.
