@@ -5,6 +5,9 @@
 Notify My Android installed. See www.notifymyandroid.com/ for more
 information.
 
+copyright: Copyright (c) Jeffrey Goettsch and other contributors.
+license: BSD, see LICENSE for details.
+
 """
 
 
