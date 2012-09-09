@@ -1,0 +1,11 @@
+syntax: regexp
+(^|/)\..*
+^tests/nmakeys.py
+
+syntax: glob
+*.egg-info
+*.orig
+*.pyc
+*.sqlite
+build
+dist
