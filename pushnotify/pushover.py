@@ -12,6 +12,7 @@ license: BSD, see LICENSE for details.
 
 
 import json
+import time
 import urllib
 import urllib2
 
@@ -32,35 +33,60 @@ class Client(object):
 
     """
 
-    def __init__(self, token):
+    def __init__(self, token, users=None):
         """Initialize the Pushover client.
 
         Args:
-            token: A string containing a valid API token.
+            token: A string of 30 characters containing a valid API
+                token.
+            users: A list containing 1 or 2-item tuples, where the first
+                item is a string of 30 characters containing a user
+                token, and the second is an optional string of up to 25
+                characters containing a device name for the given user.
+                (default: None)
 
         """
 
         self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
+        self._last_code = None
+        self._last_device = None
+        self._last_errors = None
+        self._last_status = None
+        self._last_token = None
+        self._last_user = None
 
         self.token = token
+        self.users = [] if users is None else users
 
     def _parse_response(self, stream, verify=False):
 
         response = json.loads(stream.read())
+        print response
 
         self._last_code = stream.code
-        if 'user' in response.keys():
-            self._last_user = response['user']
-        else:
-            self._last_user = None
-        if 'status' in response.keys():
-            self._last_status = response['status']
-        else:
-            self._last_status = None
         if 'device' in response.keys():
             self._last_device = response['device']
         else:
             self._last_device = None
+        if 'errors' in response.keys():
+            self._last_errors = response['errors']
+        else:
+            self._last_errors = None
+        if 'status' in response.keys():
+            self._last_status = response['status']
+        else:
+            self._last_status = None
+        if 'token' in response.keys():
+            self._last_token = response['token']
+        if 'user' in response.keys():
+            self._last_user = response['user']
+        else:
+            self._last_user = None
+
+        if self._last_status == 1 or verify:
+            return
+        else:
+            self._raise_exception()
 
     def _post(self, url, data):
 
@@ -71,6 +97,91 @@ class Client(object):
             return exc
         else:
             return response_stream
+
+    def _raise_exception(self):
+
+        msg = ''
+        if self._last_errors:
+            messages = []
+            for key, value in self._last_errors.items():
+                messages.append('{0} {1}'.format(key, value[0]))
+            msg = '; '.join(messages)
+
+        if self._last_device and 'invalid' in self._last_device:
+            raise exceptions.ApiKeyError('device invalid', self._last_code)
+
+        elif self._last_token and 'invalid' in self._last_token:
+            raise exceptions.ApiKeyError('token invalid', self._last_code)
+
+        elif self._last_user and 'invalid' in self._last_user:
+            raise exceptions.ApiKeyError('user invalid', self._last_code)
+
+        elif self._last_code == 429:
+            # TODO: what is actually returned when the rate limit is hit?
+
+            msg = 'too many messages sent this month' if not msg else msg
+            raise exceptions.RateLimitExceeded(msg, self._last_code)
+
+        elif self._last_code >= 500 and self._last_code <= 599:
+            raise exceptions.ServerError(msg, self._last_code)
+
+        elif self._last_errors:
+            raise exceptions.FormatError(msg, self._last_code)
+
+        else:
+            raise exceptions.UnrecognizedResponseError(msg, self._last_code)
+
+    def notify(self, title, message, kwargs=None):
+        """
+
+        Args:
+            title: A string of up to 100 characters containing the
+                title of the message (i.e. subject or brief description)
+            message: A string of up to 512 characters containing the
+                notification text.
+            kwargs: A dictionary with any of the following strings as
+                    keys:
+                priority: The integer 1, which will make the
+                    notification display in red and override any set
+                    quiet hours.
+                url: A string of up to 500 characters containing a URL
+                    to attach to the notification.
+                url_title: A string of up to 50 characters containing a
+                    title to give the attached URL.
+                (default: None)
+
+        Raises:
+            pushnotify.exceptions.ApiKeyError
+            pushnotify.exceptions.FormatError
+            pushnotify.exceptions.RateLimitExceeded
+            pushnotify.exceptions.ServerError
+            pushnotify.exceptions.UnrecognizedResponseError
+
+        """
+
+        # TODO: what to do if no users set?
+
+        for user in self.users:
+            data = {'token': self.token,
+                    'user': user[0],
+                    'title': title,
+                    'message': message,
+                    'timestamp': int(time.time())}
+
+            if user[1]:
+                data['device'] = user[1]
+
+            if kwargs:
+                data.update(kwargs)
+
+            print data
+
+            data = urllib.urlencode(data)
+
+            response = self._post(NOTIFY_URL, data)
+            self._parse_response(response)
+
+        # TODO: if each notification fails, raise an exception
 
     def verify_user(self, user):
         """Verify a user token.
@@ -117,7 +228,7 @@ class Client(object):
         self._parse_response(response_stream, True)
 
         if self._last_user and 'invalid' in self._last_user.lower():
-            raise exceptions.ApiKeyError(self._last_user, self._last_code)
+            self._raise_exception()
 
         return self._last_status
 

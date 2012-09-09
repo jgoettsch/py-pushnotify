@@ -120,7 +120,62 @@ class PushoverTest(unittest.TestCase):
 
     def setUp(self):
 
-        self.client = pushover.Client(PUSHOVER_TOKEN)
+        self.client = pushover.Client(PUSHOVER_TOKEN,
+                                      [(PUSHOVER_USER, PUSHOVER_DEVICE)])
+
+        self.title = 'pushnotify unit tests'
+        self.message = 'valid notification test for pushnotify'
+
+    def test_notify_valid(self):
+
+        """valid notification"""
+
+        self.client.notify(self.title, self.message,
+                           kwargs={'priority': 1, 'url': 'http://google.com/',
+                                   'url_title': 'Google'})
+
+    def test_notify_invalid_token(self):
+
+        """invalid token"""
+
+        char = self.client.token[0]
+        bad_token = self.client.token.replace(char, '_')
+        self.client.token = bad_token
+
+        self.assertRaises(exceptions.ApiKeyError, self.client.notify,
+                          self.title, self.message)
+
+    def test_notify_invalid_user(self):
+
+        """invalid user"""
+
+        char = self.client.users[0][0][0]
+        bad_users = (self.client.users[0][0].replace(char, '_'),
+                     PUSHOVER_DEVICE)
+        self.client.users = bad_users
+
+        self.assertRaises(exceptions.ApiKeyError, self.client.notify,
+                          self.title, self.message)
+
+    def test_notify_invalid_device(self):
+
+        """invalid device"""
+
+        char = self.client.users[0][1][0]
+        bad_users = (PUSHOVER_USER, self.client.users[0][1].replace(char, '_'))
+        self.client.users = bad_users
+
+        self.assertRaises(exceptions.ApiKeyError, self.client.notify,
+                          self.title, self.message)
+
+    def test_notify_invalid_args(self):
+
+        """invalid argument lengths"""
+
+        msg = 'a' * 513
+
+        self.assertRaises(exceptions.FormatError, self.client.notify,
+                          self.title, msg)
 
     def test_verify_user_valid(self):
         """Test veriy_user with a valid user token.
