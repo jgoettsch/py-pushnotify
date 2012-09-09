@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8
 
+"""Module for exceptions.
+
+"""
+
 
 class PushNotifyError(Exception):
     """Base exception for all pushnotify errors.
@@ -13,6 +17,7 @@ class PushNotifyError(Exception):
 
     def __init__(self, *args):
 
+        super(PushNotifyError, self).__init__()
         self.args = [arg for arg in args]
 
 
