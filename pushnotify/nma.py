@@ -90,6 +90,14 @@ class Client(object):
 
         return root
 
+    def _post(self, url, data):
+
+        request = urllib2.Request(url, data)
+        response_stream = self._browser.open(request)
+        response = response_stream.read()
+
+        return response
+
     def _raise_exception(self):
 
         if self._last_code == '400':
@@ -107,14 +115,6 @@ class Client(object):
         else:
             raise exceptions.UnknownError(self._last_message,
                                           int(self._last_code))
-
-    def _post(self, url, data):
-
-        request = urllib2.Request(url, data)
-        response_stream = self._browser.open(request)
-        response = response_stream.read()
-
-        return response
 
     def notify(self, app, event, desc, kwargs=None):
         """Send a notification to each apikey in self.apikeys.
