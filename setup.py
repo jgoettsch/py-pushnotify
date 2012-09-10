@@ -14,10 +14,10 @@ setup(
     author_email='jgoettsch@gmail.com',
     url='https://bitbucket.org/jgoettsch/py-pushnotify/',
     description=('A package for sending push notifications to Android '
-                 'devices.'),
+                 'and iOS devices.'),
     long_description=('A package for sending push notifications to '
                       'Android devices. It requires Notify My Android '
-                      'be installed on each device.'),
+                      'or Pushover be installed on each device.'),
     download_url=('https://bitbucket.org/jgoettsch/py-pushnotify/get/'
                   '{0}.tar.gz').format(version),
     classifiers=[
