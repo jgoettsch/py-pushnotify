@@ -61,7 +61,6 @@ class Client(object):
     def _parse_response(self, stream, verify=False):
 
         response = json.loads(stream.read())
-        print response
 
         self._last_code = stream.code
         if 'device' in response.keys():
@@ -83,10 +82,7 @@ class Client(object):
         else:
             self._last_user = None
 
-        if self._last_status == 1 or verify:
-            return
-        else:
-            self._raise_exception()
+        return self._last_status
 
     def _post(self, url, data):
 
@@ -132,7 +128,7 @@ class Client(object):
             raise exceptions.UnrecognizedResponseError(msg, self._last_code)
 
     def notify(self, title, message, kwargs=None):
-        """
+        """Send a notification to each user/device in self.users.
 
         Args:
             title: A string of up to 100 characters containing the
@@ -161,6 +157,11 @@ class Client(object):
 
         # TODO: what to do if no users set?
 
+        """Here we match the behavior of Notify My Android and Prowl:
+        raise a single exception if and only if every notification
+        fails"""
+
+        raise_exception = False
         for user in self.users:
             data = {'token': self.token,
                     'user': user[0],
@@ -174,14 +175,15 @@ class Client(object):
             if kwargs:
                 data.update(kwargs)
 
-            print data
-
             data = urllib.urlencode(data)
 
             response = self._post(NOTIFY_URL, data)
-            self._parse_response(response)
+            status = self._parse_response(response)
+            if not status:
+                raise_exception = not status
 
-        # TODO: if each notification fails, raise an exception
+        if raise_exception:
+            self._raise_exception()
 
     def verify_user(self, user):
         """Verify a user token.
