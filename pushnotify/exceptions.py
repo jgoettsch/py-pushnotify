@@ -48,6 +48,18 @@ class FormatError(PushNotifyError):
     pass
 
 
+class PermissionDenied(PushNotifyError):
+    """Raised when a request had not been approved.
+
+    Args:
+        args[0]: A string containing a message from the server.
+        args[1]: An integer containing an error code from the server.
+
+    """
+
+    pass
+
+
 class RateLimitExceeded(PushNotifyError):
     """Raised when too many requests are submitted in too small a time
     frame.

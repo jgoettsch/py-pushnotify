@@ -13,17 +13,25 @@ import unittest
 
 from pushnotify import exceptions
 from pushnotify import nma
+from pushnotify import prowl
 from pushnotify import pushover
 
 try:
     imp.find_module('nmakeys', [os.path.dirname(__file__)])
 except ImportError:
-    NMA_API_KEYS = {}
+    NMA_API_KEYS = []
     NMA_DEVELOPER_KEY = ''
 else:
     from nmakeys import API_KEYS as NMA_API_KEYS
     from nmakeys import DEVELOPER_KEY as NMA_DEVELOPER_KEY
-
+try:
+    imp.find_module('prowlkeys', [os.path.dirname(__file__)])
+except ImportError:
+    PROWL_API_KEYS = []
+    PROWL_PROVIDER_KEY = ''
+else:
+    from prowlkeys import API_KEYS as PROWL_API_KEYS
+    from prowlkeys import PROVIDER_KEY as PROWL_PROVIDER_KEY
 try:
     imp.find_module('pushoverkeys', [os.path.dirname(__file__)])
 except ImportError:
@@ -116,6 +124,74 @@ class NMATest(unittest.TestCase):
         self.assertFalse(self.client.verify(apikey))
 
 
+class ProwlTest(unittest.TestCase):
+
+    def setUp(self):
+
+        self.client = prowl.Client(PROWL_API_KEYS, PROWL_PROVIDER_KEY)
+
+        self.app = 'pushnotify unit tests'
+        self.event = 'unit test: test_notify'
+        self.desc = 'valid notification test for pushnotify'
+
+    def test_notify_valid(self):
+        """Test notify with a valid notification.
+
+        """
+
+        self.client.notify(self.app, self.event, self.desc,
+                           kwargs={'priority': 0, 'url': 'http://google.com/'})
+
+    def test_notify_invalid(self):
+        """Test notify with invalid notifications.
+
+        """
+
+        """invalid API key"""
+
+        char = self.client.apikeys[0][0]
+        apikey = self.client.apikeys[0].replace(char, '_')
+        self.client.apikeys = [apikey, ]
+        self.client.developerkey = ''
+
+        self.assertRaises(exceptions.ApiKeyError,
+                          self.client.notify, self.app, self.event, self.desc)
+
+        self.client.apikeys = NMA_API_KEYS
+        self.client.developerkey = NMA_DEVELOPER_KEY
+
+        """invalid argument lengths"""
+
+        bad_app = 'a' * 257
+        self.assertRaises(exceptions.FormatError,
+                          self.client.notify, bad_app, self.event, self.desc)
+
+    def test_verify_user_valid(self):
+        """Test verify_user with a valid API key.
+
+        """
+
+        self.assertTrue(self.client.verify_user(self.client.apikeys[0]))
+
+    def test_verify_user_invalid(self):
+        """Test verify_user with invalid API keys.
+
+        """
+
+        """invalid API key of incorrect length"""
+
+        apikey = u'{0}{1}'.format(self.client.apikeys[0], '1')
+
+        self.assertFalse(self.client.verify_user(apikey))
+
+        """invalid API key of correct length"""
+
+        char = self.client.apikeys[0][0]
+        apikey = self.client.apikeys[0].replace(char, '_')
+
+        self.assertFalse(self.client.verify_user(apikey))
+
+
 class PushoverTest(unittest.TestCase):
 
     def setUp(self):
@@ -127,16 +203,18 @@ class PushoverTest(unittest.TestCase):
         self.message = 'valid notification test for pushnotify'
 
     def test_notify_valid(self):
+        """Test notify with a valid notification.
 
-        """valid notification"""
+        """
 
         self.client.notify(self.title, self.message,
                            kwargs={'priority': 1, 'url': 'http://google.com/',
                                    'url_title': 'Google'})
 
     def test_notify_invalid_token(self):
+        """Test notify with an invalid token.
 
-        """invalid token"""
+        """
 
         char = self.client.token[0]
         bad_token = self.client.token.replace(char, '_')
@@ -146,8 +224,9 @@ class PushoverTest(unittest.TestCase):
                           self.title, self.message)
 
     def test_notify_invalid_user(self):
+        """Test notify with an invalid user.
 
-        """invalid user"""
+        """
 
         char = self.client.users[0][0][0]
         bad_users = (self.client.users[0][0].replace(char, '_'),
@@ -158,8 +237,9 @@ class PushoverTest(unittest.TestCase):
                           self.title, self.message)
 
     def test_notify_invalid_device(self):
+        """Test notify with an invalid device.
 
-        """invalid device"""
+        """
 
         char = self.client.users[0][1][0]
         bad_users = (PUSHOVER_USER, self.client.users[0][1].replace(char, '_'))
@@ -169,8 +249,9 @@ class PushoverTest(unittest.TestCase):
                           self.title, self.message)
 
     def test_notify_invalid_args(self):
+        """Test notify with invalid argument lengths.
 
-        """invalid argument lengths"""
+        """
 
         msg = 'a' * 513
 
