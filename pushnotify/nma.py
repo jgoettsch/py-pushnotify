@@ -183,7 +183,12 @@ class Client(object):
 
         """
 
-        querystring = urllib.urlencode({'apikey': apikey})
+        data = {'apikey': apikey}
+
+        if self.developerkey:
+            data['developerkey'] = self.developerkey
+
+        querystring = urllib.urlencode(data)
         url = '?'.join([VERIFY_URL, querystring])
 
         response = self._get(url)
