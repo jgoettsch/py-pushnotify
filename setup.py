@@ -4,7 +4,7 @@
 from distutils.core import setup
 
 
-version = '0.2p'
+version = '0.2.1'
 
 
 setup(
@@ -16,8 +16,8 @@ setup(
     description=('A package for sending push notifications to Android '
                  'and iOS devices.'),
     long_description=('A package for sending push notifications to '
-                      'Android devices. It requires Notify My Android '
-                      'or Pushover be installed on each device.'),
+                      'Android and iOS devices. It requires Notify My '
+                      'Android or Pushover be installed on each device.'),
     download_url=('https://bitbucket.org/jgoettsch/py-pushnotify/get/'
                   '{0}.tar.gz').format(version),
     classifiers=[
