@@ -17,7 +17,8 @@ setup(
                  'and iOS devices.'),
     long_description=('A package for sending push notifications to '
                       'Android and iOS devices. It requires Notify My '
-                      'Android or Pushover be installed on each device.'),
+                      'Android, Prowl, or Pushover to be installed on '
+                      'each device.'),
     download_url=('https://bitbucket.org/jgoettsch/py-pushnotify/get/'
                   '{0}.tar.gz').format(version),
     classifiers=[
