@@ -1,9 +1,9 @@
 syntax: regexp
 (^|/)\..*
 ^MANIFEST
-^tests/nmakeys.py
-^tests/prowlkeys.py
-^tests/pushoverkeys.py
+^pushnotify/tests/nmakeys.py
+^pushnotify/tests/prowlkeys.py
+^pushnotify/tests/pushoverkeys.py
 
 syntax: glob
 *.egg-info
