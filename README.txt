@@ -12,7 +12,7 @@ See
 for more details about these applications.
 
 All development for py-pushnotify takes place on bitbucket:
-  https://bitbucket.org/jgoettsch/
+  https://bitbucket.org/jgoettsch/py-pushnotify/
 
 If you discover a bug, please go to the above page and create an issue
 ticket. If you have any questions, please contact the author.
