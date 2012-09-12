@@ -9,8 +9,9 @@ version = '0.2.1p'
 
 setup(
     name='pushnotify',
+    packages=['pushnotify'],
     version=version,
-    author='Jeffrey Goettsch and other contributors',
+    author='Jeffrey Goettsch',
     author_email='jgoettsch@gmail.com',
     url='https://bitbucket.org/jgoettsch/py-pushnotify/',
     description=('A package for sending push notifications to Android '
@@ -24,8 +25,12 @@ setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
         'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries',
-        'Topic :: Software Development :: Libraries :: Python Modules'])
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: System :: Monitoring',
+        'Topic :: System :: Systems Administration'])
