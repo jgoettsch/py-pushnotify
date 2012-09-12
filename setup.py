@@ -9,7 +9,7 @@ version = '0.2.1p'
 
 setup(
     name='pushnotify',
-    packages=['pushnotify'],
+    packages=['pushnotify', 'pushnotify.tests'],
     version=version,
     author='Jeffrey Goettsch',
     author_email='jgoettsch@gmail.com',
