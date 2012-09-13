@@ -22,16 +22,16 @@ except ImportError:
     NMA_API_KEYS = []
     NMA_DEVELOPER_KEY = ''
 else:
-    from nmakeys import API_KEYS as NMA_API_KEYS
-    from nmakeys import DEVELOPER_KEY as NMA_DEVELOPER_KEY
+    from pushnotify.tests.nmakeys import API_KEYS as NMA_API_KEYS
+    from pushnotify.tests.nmakeys import DEVELOPER_KEY as NMA_DEVELOPER_KEY
 try:
     imp.find_module('prowlkeys', [os.path.dirname(__file__)])
 except ImportError:
     PROWL_API_KEYS = []
     PROWL_PROVIDER_KEY = ''
 else:
-    from prowlkeys import API_KEYS as PROWL_API_KEYS
-    from prowlkeys import PROVIDER_KEY as PROWL_PROVIDER_KEY
+    from pushnotify.tests.prowlkeys import API_KEYS as PROWL_API_KEYS
+    from pushnotify.tests.prowlkeys import PROVIDER_KEY as PROWL_PROVIDER_KEY
 try:
     imp.find_module('pushoverkeys', [os.path.dirname(__file__)])
 except ImportError:
@@ -39,9 +39,9 @@ except ImportError:
     PUSHOVER_USER = ''
     PUSHOVER_DEVICE = ''
 else:
-    from pushoverkeys import TOKEN as PUSHOVER_TOKEN
-    from pushoverkeys import USER as PUSHOVER_USER
-    from pushoverkeys import DEVICE as PUSHOVER_DEVICE
+    from pushnotify.tests.pushoverkeys import TOKEN as PUSHOVER_TOKEN
+    from pushnotify.tests.pushoverkeys import USER as PUSHOVER_USER
+    from pushnotify.tests.pushoverkeys import DEVICE as PUSHOVER_DEVICE
 
 
 class NMATest(unittest.TestCase):
