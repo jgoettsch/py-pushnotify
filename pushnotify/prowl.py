@@ -25,6 +25,8 @@ from pushnotify import exceptions
 PUBLIC_API_URL = u'https://api.prowlapp.com/publicapi'
 VERIFY_URL = u'/'.join([PUBLIC_API_URL, 'verify'])
 NOTIFY_URL = u'/'.join([PUBLIC_API_URL, 'add'])
+RETRIEVE_TOKEN_URL = u'/'.join([PUBLIC_API_URL, 'retrieve', 'token'])
+RETRIEVE_APIKEY_URL = u'/'.join([PUBLIC_API_URL, 'retrieve', 'apikey'])
 
 
 class Client(object):
@@ -55,6 +57,9 @@ class Client(object):
         self._last_message = None
         self._last_remaining = None
         self._last_resetdate = None
+        self._last_token = None
+        self._last_token_url = None
+        self._last_apikey = None
 
         self.apikeys = [] if apikeys is None else apikeys
         self.providerkey = providerkey
@@ -70,8 +75,8 @@ class Client(object):
             return response_stream
 
     def _parse_response(self, response, verify=False):
+
         xmlresp = response.read()
-        print xmlresp
         root = ElementTree.fromstring(xmlresp)
 
         self._last_type = root[0].tag.lower()
@@ -91,6 +96,21 @@ class Client(object):
                 self._raise_exception()
         else:
             raise exceptions.UnrecognizedResponseError(xmlresp, -1)
+
+        if len(root) > 1:
+            if root[1].tag.lower() == 'retrieve':
+                if 'token' in root[1].attrib:
+                    self._last_token = root[1].attrib['token']
+                    self._last_token_url = root[1].attrib['url']
+                    self._last_apikey = None
+                elif 'apikey' in root[1].attrib:
+                    self._last_token = None
+                    self.last_token_url = None
+                    self._last_apikey = root[1].attrib['apikey']
+                else:
+                    raise exceptions.UnrecognizedResponseError(xmlresp, -1)
+            else:
+                raise exceptions.UnrecognizedResponseError(xmlresp, -1)
 
         return root
 
@@ -170,6 +190,56 @@ class Client(object):
 
         response = self._post(NOTIFY_URL, data)
         self._parse_response(response)
+
+    def retrieve_apikey(self, token):
+        """Get an API key for a given token.
+
+        Once a user has approved you sending them push notifications,
+        you can supply the returned token here and get an API key.
+
+        Args:
+            token: A string containing a registration token returned
+                from the retrieve_token method.
+
+        Returns:
+            A string containing the API key.
+
+        """
+
+        data = {'providerkey': self.providerkey,
+                'token': token}
+
+        querystring = urllib.urlencode(data)
+        url = '?'.join([RETRIEVE_APIKEY_URL, querystring])
+
+        response = self._get(url)
+        self._parse_response(response)
+
+        return self._last_apikey
+
+    def retrieve_token(self):
+        """Get a registration token and approval URL.
+
+        A user follows the URL and logs in to the Prowl website to
+        approve you sending them push notifications. If you've
+        associated a 'Retrieve success URL' with your provider key, they
+        will be redirected there.
+
+        Returns:
+            A two-item tuple where the first item is a string containing
+            a registration token, and the second item is a string
+            containing the associated URL.
+        """
+
+        data = {'providerkey': self.providerkey}
+
+        querystring = urllib.urlencode(data)
+        url = '?'.join([RETRIEVE_TOKEN_URL, querystring])
+
+        response = self._get(url)
+        self._parse_response(response)
+
+        return self._last_token, self._last_token_url
 
     def verify_user(self, apikey):
         """Verify an API key for a user.
