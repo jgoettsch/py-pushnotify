@@ -4,7 +4,7 @@
 from distutils.core import setup
 
 
-version = '0.3'
+version = '0.3p'
 
 
 setup(
