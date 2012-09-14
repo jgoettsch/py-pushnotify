@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8
 
-"""copyright: Copyright (c) Jeffrey Goettsch and other contributors.
+"""Unit tests.
+
+copyright: Copyright (c) Jeffrey Goettsch and other contributors.
 license: BSD, see LICENSE for details.
 
 """
@@ -29,9 +31,11 @@ try:
 except ImportError:
     PROWL_API_KEYS = []
     PROWL_PROVIDER_KEY = ''
+    PROWL_REG_TOKEN = ''
 else:
     from pushnotify.tests.prowlkeys import API_KEYS as PROWL_API_KEYS
     from pushnotify.tests.prowlkeys import PROVIDER_KEY as PROWL_PROVIDER_KEY
+    from pushnotify.tests.prowlkeys import REG_TOKEN as PROWL_REG_TOKEN
 try:
     imp.find_module('pushoverkeys', [os.path.dirname(__file__)])
 except ImportError:
@@ -45,6 +49,9 @@ else:
 
 
 class NMATest(unittest.TestCase):
+    """Test the Notify my Android client.
+
+    """
 
     def setUp(self):
 
@@ -59,11 +66,11 @@ class NMATest(unittest.TestCase):
 
         """
 
-        """valid notification"""
+        # valid notification
 
         self.client.notify(self.app, self.event, self.desc)
 
-        """valid notification, extra arguments, html"""
+        # valid notification, extra arguments, html
 
         html_desc = '<h1>{0}</h1><p>{1}<br>{2}</p>'.format(
             self.app, self.event, self.desc)
@@ -79,7 +86,7 @@ class NMATest(unittest.TestCase):
 
         """
 
-        """invalid API key"""
+        # invalid API key
 
         char = self.client.apikeys[0][0]
         apikey = self.client.apikeys[0].replace(char, '_')
@@ -92,7 +99,7 @@ class NMATest(unittest.TestCase):
         self.client.apikeys = NMA_API_KEYS
         self.client.developerkey = NMA_DEVELOPER_KEY
 
-        """invalid argument lengths"""
+        # invalid argument lengths
 
         bad_app = 'a' * 257
         self.assertRaises(exceptions.FormatError,
@@ -110,13 +117,13 @@ class NMATest(unittest.TestCase):
 
         """
 
-        """invalid API key of incorrect length"""
+        # invalid API key of incorrect length
 
         apikey = u'{0}{1}'.format(self.client.apikeys[0], '1')
 
         self.assertFalse(self.client.verify(apikey))
 
-        """invalid API key of correct length"""
+        # invalid API key of correct length
 
         char = self.client.apikeys[0][0]
         apikey = self.client.apikeys[0].replace(char, '_')
@@ -125,6 +132,9 @@ class NMATest(unittest.TestCase):
 
 
 class ProwlTest(unittest.TestCase):
+    """Test the Prowl client.
+
+    """
 
     def setUp(self):
 
@@ -147,7 +157,7 @@ class ProwlTest(unittest.TestCase):
 
         """
 
-        """invalid API key"""
+        # invalid API key
 
         char = self.client.apikeys[0][0]
         apikey = self.client.apikeys[0].replace(char, '_')
@@ -160,11 +170,56 @@ class ProwlTest(unittest.TestCase):
         self.client.apikeys = NMA_API_KEYS
         self.client.developerkey = NMA_DEVELOPER_KEY
 
-        """invalid argument lengths"""
+        # invalid argument lengths
 
         bad_app = 'a' * 257
         self.assertRaises(exceptions.FormatError,
                           self.client.notify, bad_app, self.event, self.desc)
+
+    def test_retrieve_apikey_valid(self):
+        """Test retrieve_apikey with a valid token.
+
+        """
+
+        apikey = self.client.retrieve_apikey(PROWL_REG_TOKEN)
+        self.assertTrue(apikey)
+        self.assertIs(type(apikey), str)
+
+    def test_retrieve_apikey_invalid(self):
+        """Test retrieve_apikey with an invalid token and provider key.
+
+        """
+
+        # invalid registration token
+
+        self.assertRaises(exceptions.PermissionDenied,
+                          self.client.retrieve_apikey, PROWL_REG_TOKEN[0:-1])
+
+        # invalid providerkey
+
+        self.client.providerkey = self.client.providerkey[0:-1]
+        self.assertRaises(exceptions.ApiKeyError,
+                          self.client.retrieve_apikey, PROWL_REG_TOKEN)
+
+    def test_retrieve_token_valid(self):
+        """Test retrieve_token with a valid providerkey.
+
+        """
+
+        token = self.client.retrieve_token()
+        self.assertTrue(token)
+        self.assertEqual(len(token), 2)
+        self.assertIs(type(token[0]), str)
+        self.assertIs(type(token[1]), str)
+
+    def test_retrieve_token_invalid(self):
+        """Test retrieve_token with an invalid providerkey.
+
+        """
+
+        self.client.providerkey = self.client.providerkey[0:-1]
+        self.assertRaises(exceptions.ApiKeyError,
+                          self.client.retrieve_token)
 
     def test_verify_user_valid(self):
         """Test verify_user with a valid API key.
@@ -178,13 +233,13 @@ class ProwlTest(unittest.TestCase):
 
         """
 
-        """invalid API key of incorrect length"""
+        # invalid API key of incorrect length
 
         apikey = u'{0}{1}'.format(self.client.apikeys[0], '1')
 
         self.assertFalse(self.client.verify_user(apikey))
 
-        """invalid API key of correct length"""
+        # invalid API key of correct length
 
         char = self.client.apikeys[0][0]
         apikey = self.client.apikeys[0].replace(char, '_')
@@ -193,6 +248,9 @@ class ProwlTest(unittest.TestCase):
 
 
 class PushoverTest(unittest.TestCase):
+    """Test the Pushover client.
+
+    """
 
     def setUp(self):
 
