@@ -14,11 +14,6 @@ See
 
 for more details about these applications.
 
-Installation
-------------
-
-For installation instructions, see the INSTALL file.
-
 Development
 -----------
 
@@ -60,9 +55,3 @@ To run the test suite, you will have to create three modules:
     DEVICE. TOKEN is a string containing a valid API token. USER is a
     string containing a valid user identifier. DEVICE is a string
     containing a valid device identifier for the given user.
-
-Help
-----
-
-If you have any questions, please contact the author.
-See the AUTHORS file.
