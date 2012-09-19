@@ -130,6 +130,10 @@ class Client(object):
     def notify(self, title, message, kwargs=None):
         """Send a notification to each user/device in self.users.
 
+        As of 2012-09-18, this is not returning a 4xx status code as
+        per the Pushover API docs, but instead chopping the delivered
+        messages off at 512 characters.
+
         Args:
             title: A string of up to 100 characters containing the
                 title of the message (i.e. subject or brief description)

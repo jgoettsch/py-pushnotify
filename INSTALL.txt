@@ -1,9 +1,14 @@
-If you have already downloaded py-pushnotify, simply run the following
-command inside this directory:
+Installation
+------------
 
-    python setup.py install
+If you have already downloaded pushnotify, run the following
+command inside this directory::
 
-If you have not yet downloaded py-pushnotify, it would be easier to do
-the following:
+    $ python setup.py install
 
-    pip -e install py-pushnotify
+If you have not yet downloaded pushnotify, it would be easier to do
+the following::
+
+    $ pip install pushnotify
+
+Either method will install pushnotify into your current environment.

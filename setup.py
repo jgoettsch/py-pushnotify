@@ -4,8 +4,16 @@
 from distutils.core import setup
 
 
-version = '0.3'
+version = '0.3.1'
 
+with open('README.txt') as fh:
+    long_description = fh.read()
+
+with open('INSTALL.txt') as fh:
+    long_description = '\n\n'.join([long_description, fh.read()])
+
+with open('CHANGELOG.txt') as fh:
+    long_description = '\n\n'.join([long_description, fh.read()])
 
 setup(
     name='pushnotify',
@@ -17,10 +25,7 @@ setup(
     description=(
         'py-pushnotify is a package for sending push notifications to '
         'Android and iOS devices.'),
-    long_description=(
-        'py-pushnotify is a package for sending push notifications. It '
-        'currently supports Android devices running Notify My Android '
-        'and Pushover, and iOS devices running Pushover and Prowl.'),
+    long_description=long_description,
     download_url=('https://bitbucket.org/jgoettsch/py-pushnotify/get/'
                   '{0}.tar.gz').format(version),
     classifiers=[
@@ -30,6 +35,7 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',

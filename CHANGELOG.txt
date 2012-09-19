@@ -1,3 +1,10 @@
+Changelog
+---------
+
+version 0.3.1
+
+* Prowl.Client.retrieve_token and Prowl.Client.retrieve_apikey now raise a pushnotify.exceptions.ProviderKeyError if the specified Provider Key is invalid
+
 version 0.3
 
 * added support for Prowl: http://www.prowlapp.com/

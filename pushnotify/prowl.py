@@ -130,8 +130,12 @@ class Client(object):
             raise exceptions.FormatError(self._last_message,
                                          int(self._last_code))
         elif self._last_code == '401':
-            raise exceptions.ApiKeyError(self._last_message,
-                                         int(self._last_code))
+            if 'provider' not in self._last_message.lower():
+                raise exceptions.ApiKeyError(self._last_message,
+                                             int(self._last_code))
+            else:
+                raise exceptions.ProviderKeyError(self._last_message,
+                                                  int(self._last_code))
         elif self._last_code == '406':
             raise exceptions.RateLimitExceeded(self._last_message,
                                                int(self._last_code))
@@ -201,6 +205,9 @@ class Client(object):
             token: A string containing a registration token returned
                 from the retrieve_token method.
 
+        Raises:
+            pushnotify.exceptions.ProviderKeyError
+
         Returns:
             A string containing the API key.
 
@@ -224,6 +231,9 @@ class Client(object):
         approve you sending them push notifications. If you've
         associated a 'Retrieve success URL' with your provider key, they
         will be redirected there.
+
+        Raises:
+            pushnotify.exceptions.ProviderKeyError
 
         Returns:
             A two-item tuple where the first item is a string containing
