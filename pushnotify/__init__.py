@@ -2,3 +2,8 @@
 license: BSD, see LICENSE for details.
 
 """
+
+import logging
+
+
+logger = logging.getLogger(__package__)

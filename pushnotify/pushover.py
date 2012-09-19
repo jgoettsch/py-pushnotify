@@ -12,6 +12,7 @@ license: BSD, see LICENSE for details.
 
 
 import json
+import logging
 import time
 import urllib
 import urllib2
@@ -46,6 +47,9 @@ class Client(object):
                 (default: None)
 
         """
+
+        self.logger = logging.getLogger('{0}.{1}'.format(
+            self.__module__, self.__class__.__name__))
 
         self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
         self._last_code = None

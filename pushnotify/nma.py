@@ -11,6 +11,7 @@ license: BSD, see LICENSE for details.
 """
 
 
+import logging
 import urllib
 import urllib2
 try:
@@ -47,6 +48,9 @@ class Client(object):
             developerkey: A string containing a valid developer key.
 
         """
+
+        self.logger = logging.getLogger('{0}.{1}'.format(
+            self.__module__, self.__class__.__name__))
 
         self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
         self._last_type = None
