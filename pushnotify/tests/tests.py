@@ -198,7 +198,7 @@ class ProwlTest(unittest.TestCase):
         # invalid providerkey
 
         self.client.providerkey = self.client.providerkey[0:-1]
-        self.assertRaises(exceptions.ApiKeyError,
+        self.assertRaises(exceptions.ProviderKeyError,
                           self.client.retrieve_apikey, PROWL_REG_TOKEN)
 
     def test_retrieve_token_valid(self):
@@ -218,7 +218,7 @@ class ProwlTest(unittest.TestCase):
         """
 
         self.client.providerkey = self.client.providerkey[0:-1]
-        self.assertRaises(exceptions.ApiKeyError,
+        self.assertRaises(exceptions.ProviderKeyError,
                           self.client.retrieve_token)
 
     def test_verify_user_valid(self):
@@ -311,10 +311,16 @@ class PushoverTest(unittest.TestCase):
 
         """
 
+        # as of 2012-09-18, this is not returning a 4xx status code as
+        # per the Pushover API docs, but instead chopping the delivered
+        # messages off at 512 characters
+
         msg = 'a' * 513
 
-        self.assertRaises(exceptions.FormatError, self.client.notify,
-                          self.title, msg)
+        try:
+            self.client.notify(self.title, msg)
+        except exceptions.FormatError:
+            pass
 
     def test_verify_user_valid(self):
         """Test veriy_user with a valid user token.
