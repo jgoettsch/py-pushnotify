@@ -23,7 +23,7 @@ setup(
     author_email='jgoettsch@gmail.com',
     url='https://bitbucket.org/jgoettsch/py-pushnotify/',
     description=(
-        'py-pushnotify is a package for sending push notifications to '
+        'A package for sending push notifications to '
         'Android and iOS devices.'),
     long_description=long_description,
     download_url=('https://bitbucket.org/jgoettsch/py-pushnotify/get/'
