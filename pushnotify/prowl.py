@@ -77,7 +77,6 @@ class Client(object):
     def _parse_response(self, response, verify=False):
 
         xmlresp = response.read()
-        print 'xmlresp:', xmlresp
         root = ElementTree.fromstring(xmlresp)
 
         self._last_type = root[0].tag.lower()
