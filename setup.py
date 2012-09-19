@@ -4,7 +4,7 @@
 from distutils.core import setup
 
 
-version = '0.3p'
+version = '0.3.1p'
 
 with open('README.txt') as fh:
     long_description = fh.read()
