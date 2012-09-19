@@ -7,8 +7,8 @@ test:
 check:
 	python setup.py check
 
-build: test check
-	python setup.py sdist bdist_wininst
+build: check
+	python setup.py sdist --formats=gztar,zip bdist_wininst
 
 upload: build
-	python setup.py register sdist bdist_wininst upload
+	python setup.py register sdist --formats=gztar,zip bdist_wininst upload
