@@ -198,7 +198,7 @@ class ProwlTest(unittest.TestCase):
         # invalid providerkey
 
         self.client.providerkey = self.client.providerkey[0:-1]
-        self.assertRaises(exceptions.ApiKeyError,
+        self.assertRaises(exceptions.ProviderKeyError,
                           self.client.retrieve_apikey, PROWL_REG_TOKEN)
 
     def test_retrieve_token_valid(self):
@@ -218,7 +218,7 @@ class ProwlTest(unittest.TestCase):
         """
 
         self.client.providerkey = self.client.providerkey[0:-1]
-        self.assertRaises(exceptions.ApiKeyError,
+        self.assertRaises(exceptions.ProviderKeyError,
                           self.client.retrieve_token)
 
     def test_verify_user_valid(self):
