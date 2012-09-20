@@ -1,11 +1,13 @@
 clean:
-	rm -rf dist build Manifest
+	rm -rf dist/* build/* Manifest
 
 test:
 	nosetests --with-coverage --cover-package=pushnotify pushnotify/tests/tests.py
 
+.PHONY: docs
 docs:
-	 epydoc --name pushnotify --url https://bitbucket.org/jgoettsch/py-pushnotify/ --docformat plaintext --exclude .*keys --exclude abstract --html pushnotify -o docs
+	epydoc --name pushnotify --url https://bitbucket.org/jgoettsch/py-pushnotify/ --docformat plaintext --exclude .*keys --exclude abstract --html pushnotify -o docs
+	mkdir -p build/docs
 	cp -R docs build/docs
 
 upload_docs: docs
