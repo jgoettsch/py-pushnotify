@@ -70,6 +70,8 @@ class Client(object):
 
     def _get(self, url):
 
+        self.logger.debug('_get requesting url: {0}'.format(url))
+
         request = urllib2.Request(url)
         try:
             response_stream = self._browser.open(request)
@@ -81,6 +83,8 @@ class Client(object):
     def _parse_response(self, response, verify=False):
 
         xmlresp = response.read()
+        self.logger.info('received response: {0}'.format(xmlresp))
+
         root = ElementTree.fromstring(xmlresp)
 
         self._last_type = root[0].tag.lower()
@@ -119,6 +123,9 @@ class Client(object):
         return root
 
     def _post(self, url, data):
+
+        self.logger.debug('_post sending data: {0}'.format(data))
+        self.logger.debug('_post sending to url: {0}'.format(url))
 
         request = urllib2.Request(url, data)
         try:
