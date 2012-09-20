@@ -4,6 +4,7 @@ include INSTALL.txt
 include LICENSE.txt
 include README.txt
 include TODO.txt
+recursive-include docs *
 exclude pushnotify/tests/nmakeys.py
 exclude pushnotify/tests/prowlkeys.py
 exclude pushnotify/tests/pushoverkeys.py
