@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8
 
-"""A simple example of how make to use of logging.
+"""A simple example of how to make use of logging.
 
 For more information about logging in Python,
 see: http://docs.python.org/library/logging.html
