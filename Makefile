@@ -7,6 +7,7 @@ test:
 .PHONY: docs
 docs:
 	epydoc --name pushnotify --url https://bitbucket.org/jgoettsch/py-pushnotify/ --docformat plaintext --exclude .*keys --exclude abstract --html pushnotify -o docs
+	hg add docs
 	mkdir -p build/docs
 	cp -R docs build/docs
 
