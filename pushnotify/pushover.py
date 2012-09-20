@@ -169,13 +169,15 @@ class Client(object):
 
         """
 
-        # TODO: what to do if no users set?
-
         """Here we match the behavior of Notify My Android and Prowl:
         raise a single exception if and only if every notification
         fails"""
 
         raise_exception = False
+
+        if not self.users:
+            self.logger.warn('notify called with no users set')
+
         for user in self.users:
             data = {'token': self.token,
                     'user': user[0],
