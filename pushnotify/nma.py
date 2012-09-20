@@ -64,13 +64,13 @@ class Client(object):
 
     def _get(self, url):
 
-        self.logger.debug('getting url: {0}'.format(url))
+        self.logger.debug('_get requesting url: {0}'.format(url))
 
         request = urllib2.Request(url)
         response_stream = self._browser.open(request)
         response = response_stream.read()
 
-        self.logger.info('received response from _get: {0}'.format(response))
+        self.logger.info('_get received response: {0}'.format(response))
 
         return response
 
@@ -100,14 +100,14 @@ class Client(object):
 
     def _post(self, url, data):
 
-        self.logger.debug('posting to url: {0}'.format(url))
-        self.logger.debug('posting data: {0}'.format(data))
+        self.logger.debug('_post sending data: {0}'.format(data))
+        self.logger.debug('_post sending to url: {0}'.format(url))
 
         request = urllib2.Request(url, data)
         response_stream = self._browser.open(request)
         response = response_stream.read()
 
-        self.logger.info('received response from _post: {0}'.format(response))
+        self.logger.info('_post received response: {0}'.format(response))
 
         return response
 
