@@ -64,7 +64,10 @@ class Client(object):
 
     def _parse_response(self, stream, verify=False):
 
-        response = json.loads(stream.read())
+        response = stream.read()
+        self.logger.info('received response: {0}'.format(response))
+
+        response = json.loads(response)
 
         self._last_code = stream.code
         if 'device' in response.keys():
@@ -89,6 +92,9 @@ class Client(object):
         return self._last_status
 
     def _post(self, url, data):
+
+        self.logger.debug('_post sending data: {0}'.format(data))
+        self.logger.debug('_post sending to url: {0}'.format(url))
 
         request = urllib2.Request(url, data)
         try:
