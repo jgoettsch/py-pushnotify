@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+version 0.4
+
+* each client now logs HTTP GET and POST operations
+
 version 0.3.1
 
 * Prowl.Client.retrieve_token and Prowl.Client.retrieve_apikey now raise a pushnotify.exceptions.ProviderKeyError if the specified Provider Key is invalid
