@@ -1,0 +1,14 @@
+syntax: regexp
+(^|/)\..*
+^MANIFEST
+^pushnotify/tests/nmakeys.py
+^pushnotify/tests/prowlkeys.py
+^pushnotify/tests/pushoverkeys.py
+
+syntax: glob
+*.egg-info
+*.orig
+*.pyc
+*.sqlite
+build
+dist
