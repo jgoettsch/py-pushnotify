@@ -6,13 +6,13 @@ from setuptools import setup
 
 version = '0.3.1p'
 
-with open('README.txt') as fh:
+with open('README.rst') as fh:
     long_description = fh.read()
 
-with open('INSTALL.txt') as fh:
+with open('INSTALL.rst') as fh:
     long_description = '\n\n'.join([long_description, fh.read()])
 
-with open('CHANGELOG.txt') as fh:
+with open('CHANGELOG.rst') as fh:
     long_description = '\n\n'.join([long_description, fh.read()])
 
 setup(
