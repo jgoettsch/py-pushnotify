@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8
 
-from distutils.core import setup
+from setuptools import setup
 
 
 version = '0.3.1p'
