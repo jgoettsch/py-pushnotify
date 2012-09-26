@@ -11,15 +11,15 @@ license: BSD, see LICENSE for details.
 """
 
 
-import logging
 import urllib
-import urllib2
+import warnings
 try:
     from xml.etree import cElementTree
     ElementTree = cElementTree
 except ImportError:
     from xml.etree import ElementTree
 
+from pushnotify import abstract
 from pushnotify import exceptions
 
 
@@ -28,7 +28,7 @@ VERIFY_URL = u'/'.join([PUBLIC_API_URL, 'verify'])
 NOTIFY_URL = u'/'.join([PUBLIC_API_URL, 'notify'])
 
 
-class Client(object):
+class Client(abstract.AbstractClient):
     """Client for sending push notificiations to Android devices with
     the Notify My Android application installed.
 
@@ -39,7 +39,7 @@ class Client(object):
 
     """
 
-    def __init__(self, apikeys=None, developerkey=None):
+    def __init__(self, type_, developerkey='', application=''):
         """Initialize the Notify My Android client.
 
         Args:
@@ -49,33 +49,13 @@ class Client(object):
 
         """
 
-        self.logger = logging.getLogger('{0}.{1}'.format(
-            self.__module__, self.__class__.__name__))
+        super(self.__class__, self).__init__(type_, developerkey, application)
 
-        self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
-        self._last_type = None
-        self._last_code = None
-        self._last_message = None
-        self._last_remaining = None
-        self._last_resettimer = None
+        self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
-        self.apikeys = [] if apikeys is None else apikeys
-        self.developerkey = developerkey
+    def _parse_response_stream(self, response_stream, verify=False):
 
-    def _get(self, url):
-
-        self.logger.debug('_get requesting url: {0}'.format(url))
-
-        request = urllib2.Request(url)
-        response_stream = self._browser.open(request)
-        response = response_stream.read()
-
-        self.logger.info('_get received response: {0}'.format(response))
-
-        return response
-
-    def _parse_response(self, xmlresp, verify=False):
-
+        xmlresp = response_stream.read()
         root = ElementTree.fromstring(xmlresp)
 
         self._last_type = root[0].tag.lower()
@@ -97,19 +77,6 @@ class Client(object):
             raise exceptions.UnrecognizedResponseError(xmlresp, -1)
 
         return root
-
-    def _post(self, url, data):
-
-        self.logger.debug('_post sending data: {0}'.format(data))
-        self.logger.debug('_post sending to url: {0}'.format(url))
-
-        request = urllib2.Request(url, data)
-        response_stream = self._browser.open(request)
-        response = response_stream.read()
-
-        self.logger.info('_post received response: {0}'.format(response))
-
-        return response
 
     def _raise_exception(self):
 
@@ -179,10 +146,22 @@ class Client(object):
         self._parse_response(response)
 
     def verify(self, apikey):
-        """Verify an API key.
+        """This method is deprecated. Use verify_user instead.
+
+        """
+
+        msg = 'The verify method is deprecated. User verify_user instead.'
+        self.logger.warn(msg)
+        warnings.warn(msg, DeprecationWarning)
+
+        return self.verify_user(apikey)
+
+    def verify_user(self, apikey):
+        """Verify a user's API key.
 
         Args:
-            apikey: A string of 48 characters containing an API key.
+            apikey: A string of 48 characters containing a user's API
+                key.
 
         Raises:
             pushnotify.exceptions.RateLimitExceeded
@@ -191,8 +170,8 @@ class Client(object):
             pushnotify.exceptions.UnrecognizedResponseError
 
         Returns:
-            A boolean containing True if the API key is valid, and False
-            if it is not.
+            A boolean containing True if the user's API key is valid,
+            and False if it is not.
 
         """
 
@@ -201,11 +180,8 @@ class Client(object):
         if self.developerkey:
             data['developerkey'] = self.developerkey
 
-        querystring = urllib.urlencode(data)
-        url = '?'.join([VERIFY_URL, querystring])
-
-        response = self._get(url)
-        self._parse_response(response, True)
+        response_stream = self._get(self._urls['verify'], data)
+        self._parse_response_stream(response_stream, True)
 
         return self._last_code == '200'
 
