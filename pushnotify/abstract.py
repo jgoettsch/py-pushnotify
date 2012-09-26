@@ -22,6 +22,15 @@ class AbstractClient(object):
     def __init__(self, type_, developerkey, application=''):
         """Initialize the client.
 
+        Args:
+            type_: A string containing the type of client to get. Valid
+                types are 'nma,' 'prowl,', and 'pushover,' for Notify My
+                Android, Prowl, and Pushover clients, respectively.
+            developerkey: A string containing a valid developer key for
+                the given type_ of client.
+            application: A string containing the name of the application
+                on behalf of whom the client will be sending messages.
+
         """
 
         self.logger = logging.getLogger('{0}.{1}'.format(
