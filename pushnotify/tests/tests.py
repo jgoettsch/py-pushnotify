@@ -72,16 +72,16 @@ class NMATest(unittest.TestCase):
 
         # valid notification
 
-        self.client.notify(self.app, self.event, self.desc)
+        self.client.notify(self.event, self.desc)
 
         # valid notification, extra arguments, html
 
         html_desc = '<h1>{0}</h1><p>{1}<br>{2}</p>'.format(
-            self.app, self.event, self.desc)
+            self.client.application, self.desc, self.event)
         priority = 0
         url = nma.NOTIFY_URL
 
-        self.client.notify(self.app, self.event, html_desc,
+        self.client.notify(html_desc, self.event,
                            kwargs={'priority': priority, 'url': url,
                                    'content-type': 'text/html'})
 
@@ -92,22 +92,22 @@ class NMATest(unittest.TestCase):
 
         # invalid API key
 
-        char = self.client.apikeys[0][0]
-        apikey = self.client.apikeys[0].replace(char, '_')
+        char = self.client.apikeys.keys()[0][0]
+        apikey = self.client.apikeys.keys()[0].replace(char, '_')
         self.client.apikeys = [apikey, ]
         self.client.developerkey = ''
 
         self.assertRaises(exceptions.ApiKeyError,
-                          self.client.notify, self.app, self.event, self.desc)
+                          self.client.notify, self.desc, self.event)
 
         self.client.apikeys = NMA_API_KEYS
         self.client.developerkey = NMA_DEVELOPER_KEY
 
         # invalid argument lengths
 
-        bad_app = 'a' * 257
+        bad_event = 'a' * 10001
         self.assertRaises(exceptions.FormatError,
-                          self.client.notify, bad_app, self.event, self.desc)
+                          self.client.notify, self.desc, bad_event)
 
     def test_verify_user_valid(self):
         """Test verify_user with a valid API key.

@@ -27,6 +27,8 @@ PUBLIC_API_URL = u'https://www.notifymyandroid.com/publicapi'
 VERIFY_URL = u'/'.join([PUBLIC_API_URL, 'verify'])
 NOTIFY_URL = u'/'.join([PUBLIC_API_URL, 'notify'])
 
+DESC_LIMIT = 10000
+
 
 class Client(abstract.AbstractClient):
     """Client for sending push notificiations to Android devices with
@@ -96,17 +98,17 @@ class Client(abstract.AbstractClient):
             raise exceptions.UnknownError(self._last_message,
                                           int(self._last_code))
 
-    def notify(self, app, event, desc, kwargs=None):
+    def notify(self, description, event, split=True, kwargs=None):
         """Send a notification to each apikey in self.apikeys.
 
         Args:
-            app: A string of up to 256 characters containing the name
-                of the application sending the notification.
-            event: A string of up to 1000 characters containing the
-                event that is being notified (i.e. subject or brief
-                description.)
-            desc: A string of up to 10000 characters containing the
-                notification text.
+            description: A string of up to DESC_LIMIT characters
+                containing the main notification text.
+            event: A string of up to 1000 characters containing a
+                subject or brief description of the event.
+            split: A boolean indicating whether to split long
+                descriptions among multiple notifications (True) or to
+                possibly raise an exception (False). (default True)
             kwargs: A dictionary with any of the following strings as
                     keys:
                 priority: An integer between -2 and 2, indicating the
@@ -120,8 +122,8 @@ class Client(abstract.AbstractClient):
                 (default: None)
 
         Raises:
-            pushnotify.exceptions.FormatError
             pushnotify.exceptions.ApiKeyError
+            pushnotify.exceptions.FormatError
             pushnotify.exceptions.RateLimitExceeded
             pushnotify.exceptions.ServerError
             pushnotify.exceptions.UnknownError
@@ -129,21 +131,30 @@ class Client(abstract.AbstractClient):
 
         """
 
-        data = {'apikey': ','.join(self.apikeys),
-                'application': app,
-                'event': event,
-                'description': desc}
+        def send_notify(desc, event, kwargs):
+            data = {'apikey': ','.join(self.apikeys),
+                    'application': self.application,
+                    'event': event,
+                    'description': this_desc}
 
-        if self.developerkey:
-            data['developerkey'] = self.developerkey
+            if self.developerkey:
+                data['developerkey'] = self.developerkey
 
-        if kwargs:
-            data.update(kwargs)
+            if kwargs:
+                data.update(kwargs)
 
-        data = urllib.urlencode(data)
+            data = urllib.urlencode(data)
 
-        response = self._post(NOTIFY_URL, data)
-        self._parse_response(response)
+            response_stream = self._post(NOTIFY_URL, data)
+            self._parse_response_stream(response_stream)
+
+        if split:
+            while description:
+                this_desc = description[0:DESC_LIMIT]
+                description = description[DESC_LIMIT:]
+                send_notify(this_desc, event, kwargs)
+        else:
+            send_notify(description, event, kwargs)
 
     def verify(self, apikey):
         """This method is deprecated. Use verify_user instead.
