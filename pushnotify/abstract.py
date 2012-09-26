@@ -19,7 +19,7 @@ class AbstractClient(object):
 
     """
 
-    def __init__(self, type_, developerkey, application=''):
+    def __init__(self, type_, developerkey='', application=''):
         """Initialize the client.
 
         Args:

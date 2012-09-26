@@ -13,6 +13,7 @@ import imp
 import os
 import unittest
 
+from pushnotify import get_client
 from pushnotify import exceptions
 from pushnotify import nma
 from pushnotify import prowl
@@ -55,9 +56,12 @@ class NMATest(unittest.TestCase):
 
     def setUp(self):
 
-        self.client = nma.Client(NMA_API_KEYS, NMA_DEVELOPER_KEY)
+        self.client = get_client('nma', NMA_DEVELOPER_KEY,
+                                 'pushnotify unit tests')
 
-        self.app = 'pushnotify unit tests'
+        for key in NMA_API_KEYS:
+            self.client.add_key(key)
+
         self.event = 'unit test: test_notify'
         self.desc = 'valid notification test for pushnotify'
 
@@ -105,30 +109,30 @@ class NMATest(unittest.TestCase):
         self.assertRaises(exceptions.FormatError,
                           self.client.notify, bad_app, self.event, self.desc)
 
-    def test_verify_valid(self):
-        """Test verify with a valid API key.
+    def test_verify_user_valid(self):
+        """Test verify_user with a valid API key.
 
         """
 
-        self.assertTrue(self.client.verify(self.client.apikeys[0]))
+        self.assertTrue(self.client.verify_user(self.client.apikeys.keys()[0]))
 
-    def test_verify_invalid(self):
-        """Test verify with invalid API keys.
+    def test_verify_user_invalid(self):
+        """Test verify_user with invalid API keys.
 
         """
 
         # invalid API key of incorrect length
 
-        apikey = u'{0}{1}'.format(self.client.apikeys[0], '1')
+        apikey = u'{0}{1}'.format(self.client.apikeys.keys()[0], '1')
 
-        self.assertFalse(self.client.verify(apikey))
+        self.assertFalse(self.client.verify_user(apikey))
 
         # invalid API key of correct length
 
-        char = self.client.apikeys[0][0]
-        apikey = self.client.apikeys[0].replace(char, '_')
+        char = self.client.apikeys.keys()[0][0]
+        apikey = self.client.apikeys.keys()[0].replace(char, '_')
 
-        self.assertFalse(self.client.verify(apikey))
+        self.assertFalse(self.client.verify_user(apikey))
 
 
 class ProwlTest(unittest.TestCase):
