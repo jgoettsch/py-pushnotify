@@ -36,9 +36,9 @@ class Client(abstract.AbstractClient):
 
     Member Vars:
         developerkey: A string containing a valid developer key for the
-            given type_ of client.
+            given Prowl client.
         application: A string containing the name of the application on
-            behalf of whom the client will be sending messages.
+            behalf of whom the Prowl client will be sending messages.
         apikeys: A dictionary where the keys are strings containing
             valid user API keys, and the values are lists of strings,
             each containing a valid user device key.
@@ -50,9 +50,9 @@ class Client(abstract.AbstractClient):
 
         Args:
             developerkey: A string containing a valid provider key for
-                the client.
+                the Prowl client.
             application: A string containing the name of the application
-                on behalf of whom the client will be sending messages.
+                on behalf of whom the Prowl client will be sending messages.
 
         """
 
@@ -131,14 +131,13 @@ class Client(abstract.AbstractClient):
                                           int(self._last_code))
 
     def notify(self, description, event, split=True, kwargs=None):
-        """Send a notification to each apikey in self.apikeys.
+        """Send a notification to each user's apikey in self.apikeys.
 
         Args:
             description: A string of up to DESC_LIMIT characters
                 containing the notification text.
-            event: A string of up to 1024 characters containing the
-                event that is being notified (i.e. subject or brief
-                description.)
+            event: A string of up to 1024 characters containing a
+                subject or brief description of the event.
             split: A boolean indicating whether to split long
                 descriptions among multiple notifications (True) or to
                 possibly raise an exception (False). (default True)
@@ -184,14 +183,14 @@ class Client(abstract.AbstractClient):
         else:
             send_notify(description, event, kwargs)
 
-    def retrieve_apikey(self, token):
-        """Get an API key for a given token.
+    def retrieve_apikey(self, reg_token):
+        """Get a user's API key for a given registration token.
 
         Once a user has approved you sending them push notifications,
         you can supply the returned token here and get an API key.
 
         Args:
-            token: A string containing a registration token returned
+            reg_token: A string containing a registration token returned
                 from the retrieve_token method.
 
         Raises:
@@ -203,7 +202,7 @@ class Client(abstract.AbstractClient):
         """
 
         data = {'providerkey': self.developerkey,
-                'token': token}
+                'token': reg_token}
 
         response_stream = self._get(self._urls['retrieve_apikey'], data)
         self._parse_response_stream(response_stream)
@@ -213,8 +212,8 @@ class Client(abstract.AbstractClient):
     def retrieve_token(self):
         """Get a registration token and approval URL.
 
-        A user follows the URL and logs in to the Prowl website to
-        approve you sending them push notifications. If you've
+        A user follows the approval URL and logs in to the Prowl website
+        to approve you sending them push notifications. If you have
         associated a 'Retrieve success URL' with your provider key, they
         will be redirected there.
 
