@@ -11,7 +11,6 @@ license: BSD, see LICENSE for details.
 """
 
 
-import urllib
 try:
     from xml.etree import cElementTree
     ElementTree = cElementTree
@@ -173,8 +172,6 @@ class Client(abstract.AbstractClient):
 
             if kwargs:
                 data.update(kwargs)
-
-            data = urllib.urlencode(data)
 
             response_stream = self._post(self._urls['notify'], data)
             self._parse_response_stream(response_stream)
