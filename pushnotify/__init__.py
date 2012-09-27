@@ -33,11 +33,11 @@ def get_client(type_, developerkey='', application=''):
     type_ = type_.lower()
 
     if type_ == 'nma':
-        return nma.Client(type_, developerkey, application)
+        return nma.Client(developerkey, application)
     elif type_ == 'prowl':
-        return prowl.Client(type_, developerkey, application)
+        return prowl.Client(developerkey, application)
     elif type_ == 'pushover':
-        return pushover.Client(type_, developerkey, application)
+        return pushover.Client(developerkey, application)
 
 
 if __name__ == '__main__':
