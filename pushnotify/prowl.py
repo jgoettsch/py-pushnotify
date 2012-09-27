@@ -99,7 +99,7 @@ class Client(abstract.AbstractClient):
                     self._last['apikey'] = None
                 elif 'apikey' in root[1].attrib:
                     self._last['token'] = None
-                    self.last_token_url = None
+                    self._last['token_url'] = None
                     self._last['apikey'] = root[1].attrib['apikey']
                 else:
                     raise exceptions.UnrecognizedResponseError(xmlresp, -1)
