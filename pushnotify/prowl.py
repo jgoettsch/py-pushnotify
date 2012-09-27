@@ -72,20 +72,21 @@ class Client(abstract.AbstractClient):
 
         root = ElementTree.fromstring(xmlresp)
 
-        self._last_type = root[0].tag.lower()
-        self._last_code = root[0].attrib['code']
+        self._last['type'] = root[0].tag.lower()
+        self._last['code'] = root[0].attrib['code']
 
-        if self._last_type == 'success':
-            self._last_message = None
-            self._last_remaining = root[0].attrib['remaining']
-            self._last_resetdate = root[0].attrib['resetdate']
-        elif self._last_type == 'error':
-            self._last_message = root[0].text
-            self._last_remaining = None
-            self._last_resetdate = None
+        if self._last['type'] == 'success':
+            self._last['message'] = None
+            self._last['remaining'] = root[0].attrib['remaining']
+            self._last['resetdate'] = root[0].attrib['resetdate']
+        elif self._last['type'] == 'error':
+            self._last['message'] = root[0].text
+            self._last['remaining'] = None
+            self._last['resetdate'] = None
 
             if (not verify or
-                    (self._last_code != '400' and self._last_code != '401')):
+                    (self._last['code'] != '400' and
+                        self._last['code'] != '401')):
                 self._raise_exception()
         else:
             raise exceptions.UnrecognizedResponseError(xmlresp, -1)
@@ -93,13 +94,13 @@ class Client(abstract.AbstractClient):
         if len(root) > 1:
             if root[1].tag.lower() == 'retrieve':
                 if 'token' in root[1].attrib:
-                    self._last_token = root[1].attrib['token']
-                    self._last_token_url = root[1].attrib['url']
-                    self._last_apikey = None
+                    self._last['token'] = root[1].attrib['token']
+                    self._last['token_url'] = root[1].attrib['url']
+                    self._last['apikey'] = None
                 elif 'apikey' in root[1].attrib:
-                    self._last_token = None
+                    self._last['token'] = None
                     self.last_token_url = None
-                    self._last_apikey = root[1].attrib['apikey']
+                    self._last['apikey'] = root[1].attrib['apikey']
                 else:
                     raise exceptions.UnrecognizedResponseError(xmlresp, -1)
             else:
@@ -109,28 +110,28 @@ class Client(abstract.AbstractClient):
 
     def _raise_exception(self):
 
-        if self._last_code == '400':
-            raise exceptions.FormatError(self._last_message,
-                                         int(self._last_code))
-        elif self._last_code == '401':
-            if 'provider' not in self._last_message.lower():
-                raise exceptions.ApiKeyError(self._last_message,
-                                             int(self._last_code))
+        if self._last['code'] == '400':
+            raise exceptions.FormatError(self._last['message'],
+                                         int(self._last['code']))
+        elif self._last['code'] == '401':
+            if 'provider' not in self._last['message'].lower():
+                raise exceptions.ApiKeyError(self._last['message'],
+                                             int(self._last['code']))
             else:
-                raise exceptions.ProviderKeyError(self._last_message,
-                                                  int(self._last_code))
-        elif self._last_code == '406':
-            raise exceptions.RateLimitExceeded(self._last_message,
-                                               int(self._last_code))
-        elif self._last_code == '409':
-            raise exceptions.PermissionDenied(self._last_message,
-                                              int(self._last_code))
-        elif self._last_code == '500':
-            raise exceptions.ServerError(self._last_message,
-                                         int(self._last_code))
+                raise exceptions.ProviderKeyError(self._last['message'],
+                                                  int(self._last['code']))
+        elif self._last['code'] == '406':
+            raise exceptions.RateLimitExceeded(self._last['message'],
+                                               int(self._last['code']))
+        elif self._last['code'] == '409':
+            raise exceptions.PermissionDenied(self._last['message'],
+                                              int(self._last['code']))
+        elif self._last['code'] == '500':
+            raise exceptions.ServerError(self._last['message'],
+                                         int(self._last['code']))
         else:
-            raise exceptions.UnknownError(self._last_message,
-                                          int(self._last_code))
+            raise exceptions.UnknownError(self._last['message'],
+                                          int(self._last['code']))
 
     def notify(self, description, event, split=True, kwargs=None):
         """Send a notification to each user's apikey in self.apikeys.
@@ -209,7 +210,7 @@ class Client(abstract.AbstractClient):
         response_stream = self._get(self._urls['retrieve_apikey'], data)
         self._parse_response_stream(response_stream)
 
-        return self._last_apikey
+        return self._last['apikey']
 
     def retrieve_token(self):
         """Get a registration token and approval URL.
@@ -233,7 +234,7 @@ class Client(abstract.AbstractClient):
         response_stream = self._get(self._urls['retrieve_token'], data)
         self._parse_response_stream(response_stream)
 
-        return self._last_token, self._last_token_url
+        return self._last['token'], self._last['token_url']
 
     def verify_user(self, apikey):
         """Verify a user's API key.
@@ -262,7 +263,7 @@ class Client(abstract.AbstractClient):
         response_stream = self._get(self._urls['verify'], data)
         self._parse_response_stream(response_stream, True)
 
-        return self._last_code == '200'
+        return self._last['code'] == '200'
 
 if __name__ == '__main__':
     pass
