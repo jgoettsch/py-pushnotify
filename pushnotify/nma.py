@@ -66,20 +66,21 @@ class Client(abstract.AbstractClient):
         xmlresp = response_stream.read()
         root = ElementTree.fromstring(xmlresp)
 
-        self._last_type = root[0].tag.lower()
-        self._last_code = root[0].attrib['code']
+        self._last['type'] = root[0].tag.lower()
+        self._last['code'] = root[0].attrib['code']
 
-        if self._last_type == 'success':
-            self._last_message = None
-            self._last_remaining = root[0].attrib['remaining']
-            self._last_resettimer = root[0].attrib['resettimer']
-        elif self._last_type == 'error':
-            self._last_message = root[0].text
-            self._last_remaining = None
-            self._last_resettimer = None
+        if self._last['type'] == 'success':
+            self._last['message'] = None
+            self._last['remaining'] = root[0].attrib['remaining']
+            self._last['resettimer'] = root[0].attrib['resettimer']
+        elif self._last['type'] == 'error':
+            self._last['message'] = root[0].text
+            self._last['remaining'] = None
+            self._last['resettimer'] = None
 
             if (not verify or
-                    (self._last_code != '400' and self._last_code != '401')):
+                    (self._last['code'] != '400' and
+                        self._last['code'] != '401')):
                 self._raise_exception()
         else:
             raise exceptions.UnrecognizedResponseError(xmlresp, -1)
@@ -88,21 +89,21 @@ class Client(abstract.AbstractClient):
 
     def _raise_exception(self):
 
-        if self._last_code == '400':
-            raise exceptions.FormatError(self._last_message,
-                                         int(self._last_code))
-        elif self._last_code == '401':
-            raise exceptions.ApiKeyError(self._last_message,
-                                         int(self._last_code))
-        elif self._last_code == '402':
-            raise exceptions.RateLimitExceeded(self._last_message,
-                                               int(self._last_code))
-        elif self._last_code == '500':
-            raise exceptions.ServerError(self._last_message,
-                                         int(self._last_code))
+        if self._last['code'] == '400':
+            raise exceptions.FormatError(self._last['message'],
+                                         int(self._last['code']))
+        elif self._last['code'] == '401':
+            raise exceptions.ApiKeyError(self._last['message'],
+                                         int(self._last['code']))
+        elif self._last['code'] == '402':
+            raise exceptions.RateLimitExceeded(self._last['message'],
+                                               int(self._last['code']))
+        elif self._last['code'] == '500':
+            raise exceptions.ServerError(self._last['message'],
+                                         int(self._last['code']))
         else:
-            raise exceptions.UnknownError(self._last_message,
-                                          int(self._last_code))
+            raise exceptions.UnknownError(self._last['message'],
+                                          int(self._last['code']))
 
     def notify(self, description, event, split=True, kwargs=None):
         """Send a notification to each apikey in self.apikeys.
@@ -200,7 +201,7 @@ class Client(abstract.AbstractClient):
         response_stream = self._get(self._urls['verify'], data)
         self._parse_response_stream(response_stream, True)
 
-        return self._last_code == '200'
+        return self._last['code'] == '200'
 
 if __name__ == '__main__':
     pass
