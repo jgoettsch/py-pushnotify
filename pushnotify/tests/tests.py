@@ -85,6 +85,11 @@ class NMATest(unittest.TestCase):
                            kwargs={'priority': priority, 'url': url,
                                    'content-type': 'text/html'})
 
+        # description too long, split it up
+
+        long_desc = 'a' * 10101
+        self.client.notify(long_desc, self.event, split=True)
+
     def test_notify_invalid(self):
         """Test notify with invalid notifications.
 
