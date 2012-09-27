@@ -11,15 +11,14 @@ license: BSD, see LICENSE for details.
 """
 
 
-import logging
 import urllib
-import urllib2
 try:
     from xml.etree import cElementTree
     ElementTree = cElementTree
 except ImportError:
     from xml.etree import ElementTree
 
+from pushnotify import abstract
 from pushnotify import exceptions
 
 
@@ -29,60 +28,45 @@ NOTIFY_URL = u'/'.join([PUBLIC_API_URL, 'add'])
 RETRIEVE_TOKEN_URL = u'/'.join([PUBLIC_API_URL, 'retrieve', 'token'])
 RETRIEVE_APIKEY_URL = u'/'.join([PUBLIC_API_URL, 'retrieve', 'apikey'])
 
+DESC_LIMIT = 10000
 
-class Client(object):
+
+class Client(abstract.AbstractClient):
     """Client for sending push notificiations to iOS devices with
     the Prowl application installed.
 
     Member Vars:
-        apikeys: A list of strings, each containing a 40 character api
-            key.
-        providerkey: A string containing a 40 character provider key.
+        developerkey: A string containing a valid developer key for the
+            given type_ of client.
+        application: A string containing the name of the application on
+            behalf of whom the client will be sending messages.
+        apikeys: A dictionary where the keys are strings containing
+            valid user API keys, and the values are lists of strings,
+            each containing a valid user device key.
 
     """
 
-    def __init__(self, apikeys=None, providerkey=None):
+    def __init__(self, developerkey='', application=''):
         """Initialize the Prowl client.
 
         Args:
-            apikeys:  A list of strings of 40 characters each, each
-                containing a valid api key.
-            providerkey: A string of 40 characters containing a valid
-                provider key.
+            developerkey: A string containing a valid provider key for
+                the client.
+            application: A string containing the name of the application
+                on behalf of whom the client will be sending messages.
 
         """
 
-        self.logger = logging.getLogger('{0}.{1}'.format(
-            self.__module__, self.__class__.__name__))
+        super(self.__class__, self).__init__(developerkey, application)
 
-        self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
-        self._last_type = None
-        self._last_code = None
-        self._last_message = None
-        self._last_remaining = None
-        self._last_resetdate = None
-        self._last_token = None
-        self._last_token_url = None
-        self._last_apikey = None
+        self._type = 'prowl'
+        self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL,
+                      'retrieve_token': RETRIEVE_TOKEN_URL,
+                      'retrieve_apikey': RETRIEVE_APIKEY_URL}
 
-        self.apikeys = [] if apikeys is None else apikeys
-        self.providerkey = providerkey
+    def _parse_response_stream(self, response_stream, verify=False):
 
-    def _get(self, url):
-
-        self.logger.debug('_get requesting url: {0}'.format(url))
-
-        request = urllib2.Request(url)
-        try:
-            response_stream = self._browser.open(request)
-        except urllib2.HTTPError, exc:
-            return exc
-        else:
-            return response_stream
-
-    def _parse_response(self, response, verify=False):
-
-        xmlresp = response.read()
+        xmlresp = response_stream.read()
         self.logger.info('received response: {0}'.format(xmlresp))
 
         root = ElementTree.fromstring(xmlresp)
@@ -122,19 +106,6 @@ class Client(object):
 
         return root
 
-    def _post(self, url, data):
-
-        self.logger.debug('_post sending data: {0}'.format(data))
-        self.logger.debug('_post sending to url: {0}'.format(url))
-
-        request = urllib2.Request(url, data)
-        try:
-            response_stream = self._browser.open(request)
-        except urllib2.HTTPError, exc:
-            return exc
-        else:
-            return response_stream
-
     def _raise_exception(self):
 
         if self._last_code == '400':
@@ -160,17 +131,18 @@ class Client(object):
             raise exceptions.UnknownError(self._last_message,
                                           int(self._last_code))
 
-    def notify(self, app, event, desc, kwargs=None):
+    def notify(self, description, event, split=True, kwargs=None):
         """Send a notification to each apikey in self.apikeys.
 
         Args:
-            app: A string of up to 256 characters containing the name
-                of the application sending the notification.
+            description: A string of up to DESC_LIMIT characters
+                containing the notification text.
             event: A string of up to 1024 characters containing the
                 event that is being notified (i.e. subject or brief
                 description.)
-            desc: A string of up to 10000 characters containing the
-                notification text.
+            split: A boolean indicating whether to split long
+                descriptions among multiple notifications (True) or to
+                possibly raise an exception (False). (default True)
             kwargs: A dictionary with any of the following strings as
                     keys:
                 priority: An integer between -2 and 2, indicating the
@@ -190,21 +162,30 @@ class Client(object):
 
         """
 
-        data = {'apikey': ','.join(self.apikeys),
-                'application': app,
-                'event': event,
-                'description': desc}
+        def send_notify(description, event, kwargs):
+            data = {'apikey': ','.join(self.apikeys),
+                    'application': self.application,
+                    'event': event,
+                    'description': description}
 
-        if self.providerkey:
-            data['providerkey'] = self.providerkey
+            if self.developerkey:
+                data['providerkey'] = self.developerkey
 
-        if kwargs:
-            data.update(kwargs)
+            if kwargs:
+                data.update(kwargs)
 
-        data = urllib.urlencode(data)
+            data = urllib.urlencode(data)
 
-        response = self._post(NOTIFY_URL, data)
-        self._parse_response(response)
+            response_stream = self._post(self._urls['notify'], data)
+            self._parse_response_stream(response_stream)
+
+        if split:
+            while description:
+                this_desc = description[0:DESC_LIMIT]
+                description = description[DESC_LIMIT:]
+                send_notify(this_desc, event, kwargs)
+        else:
+            send_notify(description, event, kwargs)
 
     def retrieve_apikey(self, token):
         """Get an API key for a given token.
@@ -224,14 +205,11 @@ class Client(object):
 
         """
 
-        data = {'providerkey': self.providerkey,
+        data = {'providerkey': self.developerkey,
                 'token': token}
 
-        querystring = urllib.urlencode(data)
-        url = '?'.join([RETRIEVE_APIKEY_URL, querystring])
-
-        response = self._get(url)
-        self._parse_response(response)
+        response_stream = self._get(self._urls['retrieve_apikey'], data)
+        self._parse_response_stream(response_stream)
 
         return self._last_apikey
 
@@ -252,21 +230,19 @@ class Client(object):
             containing the associated URL.
         """
 
-        data = {'providerkey': self.providerkey}
+        data = {'providerkey': self.developerkey}
 
-        querystring = urllib.urlencode(data)
-        url = '?'.join([RETRIEVE_TOKEN_URL, querystring])
-
-        response = self._get(url)
-        self._parse_response(response)
+        response_stream = self._get(self._urls['retrieve_token'], data)
+        self._parse_response_stream(response_stream)
 
         return self._last_token, self._last_token_url
 
     def verify_user(self, apikey):
-        """Verify an API key for a user.
+        """Verify a user's API key.
 
         Args:
-            apikey: A string of 40 characters containing an API key.
+            apikey: A string of 40 characters containing a user's API
+                key.
 
         Raises:
             pushnotify.exceptions.RateLimitExceeded
@@ -275,21 +251,18 @@ class Client(object):
             pushnotify.exceptions.UnrecognizedResponseError
 
         Returns:
-            A boolean containing True if the API key is valid, and False
-            if it is not.
+            A boolean containing True if the user's API key is valid,
+            and False if it is not.
 
         """
 
         data = {'apikey': apikey}
 
-        if self.providerkey:
-            data['providerkey'] = self.providerkey
+        if self.developerkey:
+            data['providerkey'] = self.developerkey
 
-        querystring = urllib.urlencode(data)
-        url = '?'.join([VERIFY_URL, querystring])
-
-        response = self._get(url)
-        self._parse_response(response, True)
+        response_stream = self._get(self._urls['verify'], data)
+        self._parse_response_stream(response_stream, True)
 
         return self._last_code == '200'
 
