@@ -152,7 +152,7 @@ class Client(abstract.AbstractClient):
 
             data = urllib.urlencode(data)
 
-            response_stream = self._post(NOTIFY_URL, data)
+            response_stream = self._post(self._urls['notify'], data)
             self._parse_response_stream(response_stream)
 
         if split:
