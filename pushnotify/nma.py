@@ -31,16 +31,17 @@ DESC_LIMIT = 10000
 
 class Client(abstract.AbstractClient):
     """Client for sending push notificiations to Android devices with
-    the Notify My Android application installed.
+    the Notify My Android (NMA) application installed.
 
     Member Vars:
         developerkey: A string containing a valid developer key for the
-            given type_ of client.
+            NMA client.
         application: A string containing the name of the application on
-            behalf of whom the client will be sending messages.
+            behalf of whom the NMA client will be sending messages.
         apikeys: A dictionary where the keys are strings containing
             valid user API keys, and the values are lists of strings,
-            each containing a valid user device key.
+            each containing a valid user device key. Device keys are not
+            used by this client.
 
     """
 
@@ -49,9 +50,10 @@ class Client(abstract.AbstractClient):
 
         Args:
             developerkey: A string containing a valid developer key for
-                the given type_ of client.
+                the NMA client.
             application: A string containing the name of the application
-                on behalf of whom the client will be sending messages.
+                on behalf of whom the NMA client will be sending
+                messages.
 
         """
 
@@ -105,7 +107,7 @@ class Client(abstract.AbstractClient):
                                           int(self._last['code']))
 
     def notify(self, description, event, split=True, kwargs=None):
-        """Send a notification to each apikey in self.apikeys.
+        """Send a notification to each user's apikey in self.apikeys.
 
         Args:
             description: A string of up to DESC_LIMIT characters

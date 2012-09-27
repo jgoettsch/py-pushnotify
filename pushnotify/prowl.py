@@ -41,7 +41,8 @@ class Client(abstract.AbstractClient):
             behalf of whom the Prowl client will be sending messages.
         apikeys: A dictionary where the keys are strings containing
             valid user API keys, and the values are lists of strings,
-            each containing a valid user device key.
+            each containing a valid user device key. Device keys are not
+            used by this client.
 
     """
 
@@ -52,7 +53,8 @@ class Client(abstract.AbstractClient):
             developerkey: A string containing a valid provider key for
                 the Prowl client.
             application: A string containing the name of the application
-                on behalf of whom the Prowl client will be sending messages.
+                on behalf of whom the Prowl client will be sending
+                messages.
 
         """
 
