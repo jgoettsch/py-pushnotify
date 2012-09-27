@@ -17,15 +17,21 @@ class AbstractClient(object):
     """Abstract client for sending push notifications. Inherit from this
     class but don't call it directly.
 
+    Member Vars:
+        developerkey: A string containing a valid developer key for the
+            given type_ of client.
+        application: A string containing the name of the application on
+            behalf of whom the client will be sending messages.
+        apikeys: A dictionary where the keys are strings containing
+            valid user API keys, and the values are lists of strings,
+            each containing a valid user device key.
+
     """
 
-    def __init__(self, type_, developerkey='', application=''):
+    def __init__(self, developerkey='', application=''):
         """Initialize the client.
 
         Args:
-            type_: A string containing the type of client to get. Valid
-                types are 'nma,' 'prowl,', and 'pushover,' for Notify My
-                Android, Prowl, and Pushover clients, respectively.
             developerkey: A string containing a valid developer key for
                 the given type_ of client.
             application: A string containing the name of the application
@@ -36,7 +42,6 @@ class AbstractClient(object):
         self.logger = logging.getLogger('{0}.{1}'.format(
             self.__module__, self.__class__.__name__))
 
-        self.type = type_
         self.developerkey = developerkey
         self.application = application
         self.apikeys = {}

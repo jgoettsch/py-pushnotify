@@ -35,24 +35,30 @@ class Client(abstract.AbstractClient):
     the Notify My Android application installed.
 
     Member Vars:
-        apikeys: A list of strings, each containing a 48 character api
-            key.
-        developerkey: A string containing a 48 character developer key.
+        developerkey: A string containing a valid developer key for the
+            given type_ of client.
+        application: A string containing the name of the application on
+            behalf of whom the client will be sending messages.
+        apikeys: A dictionary where the keys are strings containing
+            valid user API keys, and the values are lists of strings,
+            each containing a valid user device key.
 
     """
 
-    def __init__(self, type_, developerkey='', application=''):
+    def __init__(self, developerkey='', application=''):
         """Initialize the Notify My Android client.
 
         Args:
-            apikeys:  A list of strings, each containing a valid api
-                key.
-            developerkey: A string containing a valid developer key.
+            developerkey: A string containing a valid developer key for
+                the given type_ of client.
+            application: A string containing the name of the application
+                on behalf of whom the client will be sending messages.
 
         """
 
-        super(self.__class__, self).__init__(type_, developerkey, application)
+        super(self.__class__, self).__init__(developerkey, application)
 
+        self._type = 'nma'
         self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
     def _parse_response_stream(self, response_stream, verify=False):
