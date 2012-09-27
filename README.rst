@@ -21,6 +21,10 @@ All development for pushnotify takes place on bitbucket:
 
 * https://bitbucket.org/jgoettsch/py-pushnotify/
 
+You can follow our this project on Twitter:
+
+* https://twitter.com/pypushnotify
+
 To get started you can do the following::
 
     $ hg clone https://bitbucket.org/jgoettsch/py-pushnotify/
