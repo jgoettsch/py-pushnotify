@@ -81,6 +81,13 @@ class AbstractClient(object):
             return response_stream
 
     def add_key(self, apikey, device_key=''):
+        """Add the given key to self.apikeys.
+
+        Args:
+            apikey: A string containing a valid user's API key.
+            device_key: A string containing a valid device key to go
+                along with the API key. (default: '')
+        """
 
         if apikey not in self.apikeys:
             self.apikeys[apikey] = []
@@ -89,6 +96,18 @@ class AbstractClient(object):
             self.apikeys[apikey].append(device_key)
 
     def del_key(self, apikey, device_key=''):
+        """Delete the given API key or device key from self.apikeys.
+
+        If device_key is not set, delete apikey and all of its device
+        keys. Otherwise only delete the device key.
+
+        Args:
+            apikey: A string containing a valid user's API key in
+                self.apikeys.
+            device_key: A string containing a valid device key in
+                self.apikeys[apikey]. (default: '')
+
+        """
 
         if device_key:
             self.apikeys[apikey] = [value for value in self.apikeys[apikey]
