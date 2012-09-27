@@ -35,7 +35,7 @@ class Client(abstract.AbstractClient):
     the Prowl application installed.
 
     Member Vars:
-        developerkey: A string containing a valid developer key for the
+        developerkey: A string containing a valid provider key for the
             given Prowl client.
         application: A string containing the name of the application on
             behalf of whom the Prowl client will be sending messages.
