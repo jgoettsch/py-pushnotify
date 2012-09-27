@@ -67,6 +67,8 @@ class AbstractClient(object):
 
     def _post(self, url, data):
 
+        data = urllib.urlencode(data)
+
         self.logger.debug('_post sending data: {0}'.format(data))
         self.logger.debug('_post sending to url: {0}'.format(url))
 
