@@ -16,7 +16,6 @@ import unittest
 from pushnotify import get_client
 from pushnotify import exceptions
 from pushnotify import nma
-from pushnotify import prowl
 from pushnotify import pushover
 
 try:
@@ -99,13 +98,16 @@ class NMATest(unittest.TestCase):
 
         char = self.client.apikeys.keys()[0][0]
         apikey = self.client.apikeys.keys()[0].replace(char, '_')
-        self.client.apikeys = [apikey, ]
+        self.client.apikeys = {}
+        self.client.add_key(apikey)
         self.client.developerkey = ''
 
         self.assertRaises(exceptions.ApiKeyError,
                           self.client.notify, self.desc, self.event)
 
-        self.client.apikeys = NMA_API_KEYS
+        self.client.apikeys = {}
+        for key in NMA_API_KEYS:
+            self.client.add_key(key)
         self.client.developerkey = NMA_DEVELOPER_KEY
 
         # invalid argument lengths
@@ -147,43 +149,51 @@ class ProwlTest(unittest.TestCase):
 
     def setUp(self):
 
-        self.client = prowl.Client(PROWL_API_KEYS, PROWL_PROVIDER_KEY)
+        self.client = get_client('prowl', PROWL_PROVIDER_KEY,
+                                 'pushnotify unit tests')
+
+        for key in PROWL_API_KEYS:
+            self.client.add_key(key)
 
         self.app = 'pushnotify unit tests'
         self.event = 'unit test: test_notify'
         self.desc = 'valid notification test for pushnotify'
 
     def test_notify_valid(self):
-        """Test notify with a valid notification.
+        """Test notify with valid notifications.
 
         """
 
-        self.client.notify(self.app, self.event, self.desc,
+        self.client.notify(self.desc, self.event,
                            kwargs={'priority': 0, 'url': 'http://google.com/'})
 
-    def test_notify_invalid(self):
-        """Test notify with invalid notifications.
+        # description too long, split it up
+
+        long_desc = 'a' * 10101
+        self.client.notify(long_desc, self.event, split=True)
+
+    def test_notify_invalid_api_key(self):
+        """Test notify with an invalid API key.
 
         """
 
-        # invalid API key
-
-        char = self.client.apikeys[0][0]
-        apikey = self.client.apikeys[0].replace(char, '_')
-        self.client.apikeys = [apikey, ]
+        char = self.client.apikeys.keys()[0][0]
+        apikey = self.client.apikeys.keys()[0].replace(char, '_')
+        self.client.apikeys = {}
+        self.client.add_key(apikey)
         self.client.developerkey = ''
 
         self.assertRaises(exceptions.ApiKeyError,
-                          self.client.notify, self.app, self.event, self.desc)
+                          self.client.notify, self.desc, self.event)
 
-        self.client.apikeys = NMA_API_KEYS
-        self.client.developerkey = NMA_DEVELOPER_KEY
+    def test_notify_invalid_argument_lengths(self):
+        """Test notify with invalid argument lengths.
 
-        # invalid argument lengths
+        """
 
-        bad_app = 'a' * 257
+        bad_desc = 'a' * 10001
         self.assertRaises(exceptions.FormatError,
-                          self.client.notify, bad_app, self.event, self.desc)
+                          self.client.notify, bad_desc, self.event, False)
 
     def test_retrieve_apikey_valid(self):
         """Test retrieve_apikey with a valid token.
@@ -204,9 +214,9 @@ class ProwlTest(unittest.TestCase):
         self.assertRaises(exceptions.PermissionDenied,
                           self.client.retrieve_apikey, PROWL_REG_TOKEN[0:-1])
 
-        # invalid providerkey
+        # invalid developerkey
 
-        self.client.providerkey = self.client.providerkey[0:-1]
+        self.client.developerkey = self.client.developerkey[0:-1]
         self.assertRaises(exceptions.ProviderKeyError,
                           self.client.retrieve_apikey, PROWL_REG_TOKEN)
 
@@ -226,7 +236,7 @@ class ProwlTest(unittest.TestCase):
 
         """
 
-        self.client.providerkey = self.client.providerkey[0:-1]
+        self.client.developerkey = self.client.developerkey[0:-1]
         self.assertRaises(exceptions.ProviderKeyError,
                           self.client.retrieve_token)
 
@@ -235,7 +245,7 @@ class ProwlTest(unittest.TestCase):
 
         """
 
-        self.assertTrue(self.client.verify_user(self.client.apikeys[0]))
+        self.assertTrue(self.client.verify_user(self.client.apikeys.keys()[0]))
 
     def test_verify_user_invalid(self):
         """Test verify_user with invalid API keys.
@@ -244,14 +254,14 @@ class ProwlTest(unittest.TestCase):
 
         # invalid API key of incorrect length
 
-        apikey = u'{0}{1}'.format(self.client.apikeys[0], '1')
+        apikey = u'{0}{1}'.format(self.client.apikeys.keys()[0], '1')
 
         self.assertFalse(self.client.verify_user(apikey))
 
         # invalid API key of correct length
 
-        char = self.client.apikeys[0][0]
-        apikey = self.client.apikeys[0].replace(char, '_')
+        char = self.client.apikeys.keys()[0][0]
+        apikey = self.client.apikeys.keys()[0].replace(char, '_')
 
         self.assertFalse(self.client.verify_user(apikey))
 
