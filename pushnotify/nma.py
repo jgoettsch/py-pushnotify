@@ -154,6 +154,10 @@ class Client(abstract.AbstractClient):
             response_stream = self._post(self._urls['notify'], data)
             self._parse_response_stream(response_stream)
 
+        if not self.apikeys:
+            self.logger.warn('notify called with no users set')
+            return
+
         if split:
             while description:
                 this_desc = description[0:DESC_LIMIT]
