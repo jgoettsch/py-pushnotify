@@ -30,7 +30,13 @@ class Client(abstract.AbstractClient):
     with the Pushover application installed.
 
     Member Vars:
-        token: A string containing a valid API token.
+        developerkey: A string containing a valid provider key for the
+            given Pushover client.
+        application: A string containing the name of the application on
+            behalf of whom the Pushover client will be sending messages.
+        apikeys: A dictionary where the keys are strings containing
+            valid user API keys, and the values are lists of strings,
+            each containing a valid user device key.
 
     """
 
@@ -39,9 +45,9 @@ class Client(abstract.AbstractClient):
 
         Args:
             developerkey: A string containing a valid provider key for
-                the Prowl client.
+                the Pushover client.
             application: A string containing the name of the application
-                on behalf of whom the Prowl client will be sending
+                on behalf of whom the Pushover client will be sending
                 messages.
 
         """
@@ -116,17 +122,21 @@ class Client(abstract.AbstractClient):
             raise exceptions.UnrecognizedResponseError(msg, self._last['code'])
 
     def notify(self, description, event, split=True, kwargs=None):
-        """Send a notification to each user/device in self.users.
+        """Send a notification to each user's API key/device key
+        combintation in self.apikeys.
 
         As of 2012-09-18, this is not returning a 4xx status code as
         per the Pushover API docs, but instead chopping the delivered
         messages off at 512 characters.
 
         Args:
-            title: A string of up to 100 characters containing the
-                title of the message (i.e. subject or brief description)
-            message: A string of up to 512 characters containing the
-                notification text.
+            description: A string of up to DESC_LIMIT characters
+                containing the notification text.
+            event: A string of up to 100 characters containing a
+                subject or brief description of the event.
+            split: A boolean indicating whether to split long
+                descriptions among multiple notifications (True) or to
+                possibly raise an exception (False). (default True)
             kwargs: A dictionary with any of the following strings as
                     keys:
                 priority: The integer 1, which will make the
