@@ -42,6 +42,9 @@ class AbstractClient(object):
         self.logger = logging.getLogger('{0}.{1}'.format(
             self.__module__, self.__class__.__name__))
 
+        if not application:
+            application = 'pushnotify'
+
         self.developerkey = developerkey
         self.application = application
         self.apikeys = {}

@@ -40,7 +40,7 @@ class Client(abstract.AbstractClient):
 
     """
 
-    def __init__(self, developerkey='', application=''):
+    def __init__(self, developerkey, application=''):
         """Initialize the Pushover client.
 
         Args:
