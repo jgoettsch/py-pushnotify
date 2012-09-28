@@ -288,6 +288,15 @@ class PushoverTest(unittest.TestCase):
                            kwargs={'priority': 1, 'url': 'http://google.com/',
                                    'url_title': 'Google'})
 
+    def test_notify_valid_split(self):
+        """Test notify with a valid notification, splitting up a long
+        description.
+
+        """
+
+        long_desc = 'a' * 513
+        self.client.notify(long_desc, self.event, split=True)
+
     def test_notify_invalid_developerkey(self):
         """Test notify with an invalid developer key.
 
