@@ -55,7 +55,9 @@ To run the test suite, you will have to create three modules:
 
 * pushnotify/tests/pushoverkeys.py:
 
-    This file must contain three global variables: TOKEN, USER, and
-    DEVICE. TOKEN is a string containing a valid API token. USER is a
-    string containing a valid user identifier. DEVICE is a string
-    containing a valid device identifier for the given user.
+    This file must contain two global variables: TOKEN and USER.
+    TOKEN is a string containing a valid API token. USER is a
+    dictionary whose keys are strings containing valid user identifiers.
+	The key values are lists containing strings, where each string
+    contains a valid device identifier for the given API token. There
+    must be one API token, and it must have one device indentifier.
