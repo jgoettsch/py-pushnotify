@@ -154,8 +154,8 @@ class Client(abstract.AbstractClient):
                 (default: None)
 
         Raises:
-            pushnotify.exceptions.FormatError
             pushnotify.exceptions.ApiKeyError
+            pushnotify.exceptions.FormatError
             pushnotify.exceptions.RateLimitExceeded
             pushnotify.exceptions.ServerError
             pushnotify.exceptions.UnknownError
@@ -177,6 +177,10 @@ class Client(abstract.AbstractClient):
 
             response_stream = self._post(self._urls['notify'], data)
             self._parse_response_stream(response_stream)
+
+        if not self.apikeys:
+            self.logger.warn('notify called with no users set')
+            return
 
         if split:
             while description:
