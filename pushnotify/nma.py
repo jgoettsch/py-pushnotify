@@ -139,11 +139,11 @@ class Client(abstract.AbstractClient):
 
         """
 
-        def send_notify(desc, event, kwargs):
+        def send_notify(description, event, kwargs):
             data = {'apikey': ','.join(self.apikeys),
                     'application': self.application,
                     'event': event,
-                    'description': this_desc}
+                    'description': description}
 
             if self.developerkey:
                 data['developerkey'] = self.developerkey
