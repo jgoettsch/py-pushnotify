@@ -148,25 +148,31 @@ class Client(abstract.AbstractClient):
         """
 
         def send_notify(desc_list, event, kwargs, apikey, device_key=''):
-            data = {'token': self.developerkey,
-                    'user': apikey,
-                    'title': event,
-                    'message': description,
-                    'timestamp': int(time.time())}
+            status = True
 
-            if device_key:
-                data['device'] = device_key
+            for description in desc_list:
+                data = {'token': self.developerkey,
+                        'user': apikey,
+                        'title': event,
+                        'message': description,
+                        'timestamp': int(time.time())}
 
-            if kwargs:
-                data.update(kwargs)
+                if device_key:
+                    data['device'] = device_key
 
-            response = self._post(self._urls['notify'], data)
-            status = self._parse_response_stream(response)
+                if kwargs:
+                    data.update(kwargs)
 
-            return not status
+                response_stream = self._post(self._urls['notify'], data)
+                this_status = self._parse_response_stream(response_stream)
+
+                status = status and this_status
+
+            return status
 
         if not self.apikeys:
             self.logger.warn('notify called with no users set')
+            return
 
         desc_list = []
         if split:
@@ -180,20 +186,20 @@ class Client(abstract.AbstractClient):
         # raise a single exception if and only if every notification
         # fails
 
-        raise_exception = True
+        all_ok = True
 
         for apikey, device_keys in self.apikeys.items():
             if not device_keys:
-                this_raise_exception = send_notify(desc_list, event, kwargs,
+                this_ok = send_notify(desc_list, event, kwargs,
                                                    apikey)
             else:
                 for device_key in device_keys:
-                    this_raise_exception = send_notify(
+                    this_ok = send_notify(
                         desc_list, event, kwargs, apikey, device_key)
 
-            raise_exception = raise_exception and this_raise_exception
+            all_ok = all_ok and this_ok
 
-        if raise_exception:
+        if not all_ok:
             self._raise_exception()
 
     def verify_user(self, apikey):
