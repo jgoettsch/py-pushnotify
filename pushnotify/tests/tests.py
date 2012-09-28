@@ -140,7 +140,6 @@ class ProwlTest(unittest.TestCase):
         for key in PROWL_API_KEYS:
             self.client.add_key(key)
 
-        self.app = 'pushnotify unit tests'
         self.event = 'unit test: test_notify'
         self.desc = 'valid notification test for pushnotify'
 
