@@ -81,6 +81,25 @@ class AbstractClientTest(unittest.TestCase):
         self.client.add_key(apikey, device_key)
         self.assertTrue(device_key in self.client.apikeys[apikey])
 
+    def test_del_key_apikey(self):
+
+        apikey = 'foo'
+        self.client.add_key(apikey)
+        self.assertTrue(apikey in self.client.apikeys.keys())
+
+        self.client.del_key(apikey)
+        self.assertTrue(apikey not in self.client.apikeys.keys())
+
+    def test_del_key_device_key(self):
+
+        apikey = 'foo'
+        device_key = 'bar'
+        self.client.add_key(apikey, device_key)
+        self.assertTrue(device_key in self.client.apikeys[apikey])
+
+        self.client.del_key(apikey, device_key)
+        self.assertTrue(device_key not in self.client.apikeys[apikey])
+
 
 class NMATest(unittest.TestCase):
     """Test the Notify my Android client.
