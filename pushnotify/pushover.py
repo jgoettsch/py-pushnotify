@@ -158,7 +158,7 @@ class Client(abstract.AbstractClient):
         """
 
         def send_notify(desc_list, event, kwargs, apikey, device_key=''):
-            status = True
+            all_successful = True
 
             for description in desc_list:
                 data = {'token': self.developerkey,
@@ -174,11 +174,11 @@ class Client(abstract.AbstractClient):
                     data.update(kwargs)
 
                 response_stream = self._post(self._urls['notify'], data)
-                this_status = self._parse_response_stream(response_stream)
+                this_successful = self._parse_response_stream(response_stream)
 
-                status = status and this_status
+                all_successful = all_successful and this_successful
 
-            return status
+            return all_successful
 
         if not self.apikeys:
             self.logger.warn('notify called with no users set')
