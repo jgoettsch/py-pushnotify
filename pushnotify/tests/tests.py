@@ -13,6 +13,7 @@ import imp
 import os
 import unittest
 
+from pushnotify import abstract
 from pushnotify import get_client
 from pushnotify import exceptions
 from pushnotify import nma
@@ -44,6 +45,41 @@ except ImportError:
 else:
     from pushnotify.tests.pushoverkeys import TOKEN as PUSHOVER_TOKEN
     from pushnotify.tests.pushoverkeys import USER as PUSHOVER_USER
+
+
+class AbstractClientTest(unittest.TestCase):
+    """Test the AbstractClient class.
+
+    """
+
+    def setUp(self):
+
+        self.client = abstract.AbstractClient()
+
+    def test_add_key_apikey(self):
+        """Test the add_key method with an apikey.
+
+        """
+
+        apikey = 'foo'
+        self.assertTrue(apikey not in self.client.apikeys.keys())
+
+        self.client.add_key(apikey)
+        self.assertTrue(apikey in self.client.apikeys.keys())
+
+    def test_add_key_device_key(self):
+        """Test the add_key method with a device_key.
+
+        """
+
+        apikey = 'foo'
+        self.client.add_key('foo')
+
+        device_key = 'bar'
+        self.assertTrue(device_key not in self.client.apikeys[apikey])
+
+        self.client.add_key(apikey, device_key)
+        self.assertTrue(device_key in self.client.apikeys[apikey])
 
 
 class NMATest(unittest.TestCase):
