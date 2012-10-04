@@ -11,15 +11,14 @@ license: BSD, see LICENSE for details.
 """
 
 
-import logging
-import urllib
-import urllib2
+import warnings
 try:
     from xml.etree import cElementTree
     ElementTree = cElementTree
 except ImportError:
     from xml.etree import ElementTree
 
+from pushnotify import abstract
 from pushnotify import exceptions
 
 
@@ -27,119 +26,97 @@ PUBLIC_API_URL = u'https://www.notifymyandroid.com/publicapi'
 VERIFY_URL = u'/'.join([PUBLIC_API_URL, 'verify'])
 NOTIFY_URL = u'/'.join([PUBLIC_API_URL, 'notify'])
 
+DESC_LIMIT = 10000
 
-class Client(object):
+
+class Client(abstract.AbstractClient):
     """Client for sending push notificiations to Android devices with
-    the Notify My Android application installed.
+    the Notify My Android (NMA) application installed.
 
     Member Vars:
-        apikeys: A list of strings, each containing a 48 character api
-            key.
-        developerkey: A string containing a 48 character developer key.
+        developerkey: A string containing a valid developer key for the
+            NMA application.
+        application: A string containing the name of the application on
+            behalf of whom the NMA client will be sending messages.
+        apikeys: A dictionary where the keys are strings containing
+            valid user API keys, and the values are lists of strings,
+            each containing a valid user device key. Device keys are not
+            used by this client.
 
     """
 
-    def __init__(self, apikeys=None, developerkey=None):
+    def __init__(self, developerkey='', application=''):
         """Initialize the Notify My Android client.
 
         Args:
-            apikeys:  A list of strings, each containing a valid api
-                key.
-            developerkey: A string containing a valid developer key.
+            developerkey: A string containing a valid developer key for
+                the NMA application.
+            application: A string containing the name of the application
+                on behalf of whom the NMA client will be sending
+                messages.
 
         """
 
-        self.logger = logging.getLogger('{0}.{1}'.format(
-            self.__module__, self.__class__.__name__))
+        super(self.__class__, self).__init__(developerkey, application)
 
-        self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
-        self._last_type = None
-        self._last_code = None
-        self._last_message = None
-        self._last_remaining = None
-        self._last_resettimer = None
+        self._type = 'nma'
+        self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
-        self.apikeys = [] if apikeys is None else apikeys
-        self.developerkey = developerkey
+    def _parse_response_stream(self, response_stream, verify=False):
 
-    def _get(self, url):
-
-        self.logger.debug('_get requesting url: {0}'.format(url))
-
-        request = urllib2.Request(url)
-        response_stream = self._browser.open(request)
-        response = response_stream.read()
-
-        self.logger.info('_get received response: {0}'.format(response))
-
-        return response
-
-    def _parse_response(self, xmlresp, verify=False):
-
+        xmlresp = response_stream.read()
         root = ElementTree.fromstring(xmlresp)
 
-        self._last_type = root[0].tag.lower()
-        self._last_code = root[0].attrib['code']
+        self._last['type'] = root[0].tag.lower()
+        self._last['code'] = root[0].attrib['code']
 
-        if self._last_type == 'success':
-            self._last_message = None
-            self._last_remaining = root[0].attrib['remaining']
-            self._last_resettimer = root[0].attrib['resettimer']
-        elif self._last_type == 'error':
-            self._last_message = root[0].text
-            self._last_remaining = None
-            self._last_resettimer = None
+        if self._last['type'] == 'success':
+            self._last['message'] = None
+            self._last['remaining'] = root[0].attrib['remaining']
+            self._last['resettimer'] = root[0].attrib['resettimer']
+        elif self._last['type'] == 'error':
+            self._last['message'] = root[0].text
+            self._last['remaining'] = None
+            self._last['resettimer'] = None
 
             if (not verify or
-                    (self._last_code != '400' and self._last_code != '401')):
+                    (self._last['code'] != '400' and
+                        self._last['code'] != '401')):
                 self._raise_exception()
         else:
             raise exceptions.UnrecognizedResponseError(xmlresp, -1)
 
         return root
 
-    def _post(self, url, data):
-
-        self.logger.debug('_post sending data: {0}'.format(data))
-        self.logger.debug('_post sending to url: {0}'.format(url))
-
-        request = urllib2.Request(url, data)
-        response_stream = self._browser.open(request)
-        response = response_stream.read()
-
-        self.logger.info('_post received response: {0}'.format(response))
-
-        return response
-
     def _raise_exception(self):
 
-        if self._last_code == '400':
-            raise exceptions.FormatError(self._last_message,
-                                         int(self._last_code))
-        elif self._last_code == '401':
-            raise exceptions.ApiKeyError(self._last_message,
-                                         int(self._last_code))
-        elif self._last_code == '402':
-            raise exceptions.RateLimitExceeded(self._last_message,
-                                               int(self._last_code))
-        elif self._last_code == '500':
-            raise exceptions.ServerError(self._last_message,
-                                         int(self._last_code))
+        if self._last['code'] == '400':
+            raise exceptions.FormatError(self._last['message'],
+                                         int(self._last['code']))
+        elif self._last['code'] == '401':
+            raise exceptions.ApiKeyError(self._last['message'],
+                                         int(self._last['code']))
+        elif self._last['code'] == '402':
+            raise exceptions.RateLimitExceeded(self._last['message'],
+                                               int(self._last['code']))
+        elif self._last['code'] == '500':
+            raise exceptions.ServerError(self._last['message'],
+                                         int(self._last['code']))
         else:
-            raise exceptions.UnknownError(self._last_message,
-                                          int(self._last_code))
+            raise exceptions.UnknownError(self._last['message'],
+                                          int(self._last['code']))
 
-    def notify(self, app, event, desc, kwargs=None):
-        """Send a notification to each apikey in self.apikeys.
+    def notify(self, description, event, split=True, kwargs=None):
+        """Send a notification to each user's apikey in self.apikeys.
 
         Args:
-            app: A string of up to 256 characters containing the name
-                of the application sending the notification.
-            event: A string of up to 1000 characters containing the
-                event that is being notified (i.e. subject or brief
-                description.)
-            desc: A string of up to 10000 characters containing the
-                notification text.
+            description: A string of up to DESC_LIMIT characters
+                containing the main notification text.
+            event: A string of up to 1000 characters containing a
+                subject or brief description of the event.
+            split: A boolean indicating whether to split long
+                descriptions among multiple notifications (True) or to
+                possibly raise an exception (False). (default True)
             kwargs: A dictionary with any of the following strings as
                     keys:
                 priority: An integer between -2 and 2, indicating the
@@ -153,8 +130,8 @@ class Client(object):
                 (default: None)
 
         Raises:
-            pushnotify.exceptions.FormatError
             pushnotify.exceptions.ApiKeyError
+            pushnotify.exceptions.FormatError
             pushnotify.exceptions.RateLimitExceeded
             pushnotify.exceptions.ServerError
             pushnotify.exceptions.UnknownError
@@ -162,27 +139,50 @@ class Client(object):
 
         """
 
-        data = {'apikey': ','.join(self.apikeys),
-                'application': app,
-                'event': event,
-                'description': desc}
+        def send_notify(description, event, kwargs):
+            data = {'apikey': ','.join(self.apikeys),
+                    'application': self.application,
+                    'event': event,
+                    'description': description}
 
-        if self.developerkey:
-            data['developerkey'] = self.developerkey
+            if self.developerkey:
+                data['developerkey'] = self.developerkey
 
-        if kwargs:
-            data.update(kwargs)
+            if kwargs:
+                data.update(kwargs)
 
-        data = urllib.urlencode(data)
+            response_stream = self._post(self._urls['notify'], data)
+            self._parse_response_stream(response_stream)
 
-        response = self._post(NOTIFY_URL, data)
-        self._parse_response(response)
+        if not self.apikeys:
+            self.logger.warn('notify called with no users set')
+            return
+
+        if split:
+            while description:
+                this_desc = description[0:DESC_LIMIT]
+                description = description[DESC_LIMIT:]
+                send_notify(this_desc, event, kwargs)
+        else:
+            send_notify(description, event, kwargs)
 
     def verify(self, apikey):
-        """Verify an API key.
+        """This method is deprecated. Use verify_user instead.
+
+        """
+
+        msg = 'The verify method is deprecated. User verify_user instead.'
+        self.logger.warn(msg)
+        warnings.warn(msg, DeprecationWarning)
+
+        return self.verify_user(apikey)
+
+    def verify_user(self, apikey):
+        """Verify a user's API key.
 
         Args:
-            apikey: A string of 48 characters containing an API key.
+            apikey: A string of 48 characters containing a user's API
+                key.
 
         Raises:
             pushnotify.exceptions.RateLimitExceeded
@@ -191,8 +191,8 @@ class Client(object):
             pushnotify.exceptions.UnrecognizedResponseError
 
         Returns:
-            A boolean containing True if the API key is valid, and False
-            if it is not.
+            A boolean containing True if the user's API key is valid,
+            and False if it is not.
 
         """
 
@@ -201,13 +201,10 @@ class Client(object):
         if self.developerkey:
             data['developerkey'] = self.developerkey
 
-        querystring = urllib.urlencode(data)
-        url = '?'.join([VERIFY_URL, querystring])
+        response_stream = self._get(self._urls['verify'], data)
+        self._parse_response_stream(response_stream, True)
 
-        response = self._get(url)
-        self._parse_response(response, True)
-
-        return self._last_code == '200'
+        return self._last['code'] == '200'
 
 if __name__ == '__main__':
     pass

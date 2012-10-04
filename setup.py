@@ -4,7 +4,7 @@
 from setuptools import setup
 
 
-version = '0.4'
+version = '0.4p'
 
 with open('README.rst') as fh:
     long_description = fh.read()
@@ -20,7 +20,7 @@ setup(
     packages=['pushnotify', 'pushnotify.tests'],
     version=version,
     author='Jeffrey Goettsch',
-    author_email='jgoettsch@gmail.com',
+    author_email='jgoettsch+pypushnotify@gmail.com',
     url='https://bitbucket.org/jgoettsch/py-pushnotify/',
     description=(
         'A package for sending push notifications to '

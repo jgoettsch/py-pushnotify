@@ -145,7 +145,7 @@ Test the Prowl client.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="test_notify_valid"></a><span class="summary-sig-name">test_notify_valid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test notify with a valid notification.</td>
+      Test prowl.Client.notify with valid notifications.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_notify_valid">source&nbsp;code</a></span>
             
@@ -161,10 +161,45 @@ Test the Prowl client.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="test_notify_invalid"></a><span class="summary-sig-name">test_notify_invalid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test notify with invalid notifications.</td>
+          <td><span class="summary-sig"><a name="test_notify_valid_split"></a><span class="summary-sig-name">test_notify_valid_split</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Test nma.Client.notify with a valid notification, splitting
+up a long description.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_notify_invalid">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_notify_valid_split">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="test_notify_invalid_apikey"></a><span class="summary-sig-name">test_notify_invalid_apikey</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Test prowl.Client.notify with an invalid API key.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_notify_invalid_apikey">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="test_notify_invalid_argument_lengths"></a><span class="summary-sig-name">test_notify_invalid_argument_lengths</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Test prowl.Client.notify with invalid argument lengths.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_notify_invalid_argument_lengths">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -179,7 +214,7 @@ Test the Prowl client.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="test_retrieve_apikey_valid"></a><span class="summary-sig-name">test_retrieve_apikey_valid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test retrieve_apikey with a valid token.</td>
+      Test prowl.Client.retrieve_apikey with a valid token.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_retrieve_apikey_valid">source&nbsp;code</a></span>
             
@@ -195,10 +230,29 @@ Test the Prowl client.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="test_retrieve_apikey_invalid"></a><span class="summary-sig-name">test_retrieve_apikey_invalid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test retrieve_apikey with an invalid token and provider key.</td>
+          <td><span class="summary-sig"><a name="test_retrieve_apikey_invalid_reg_token"></a><span class="summary-sig-name">test_retrieve_apikey_invalid_reg_token</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Test prowl.Client.retrieve_apikey with an invalid
+registration token.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_retrieve_apikey_invalid">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_retrieve_apikey_invalid_reg_token">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="test_retrieve_apikey_invalid_developerkey"></a><span class="summary-sig-name">test_retrieve_apikey_invalid_developerkey</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Test prowl.Client.retrieve_apikey with an invalid developer
+key.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_retrieve_apikey_invalid_developerkey">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -213,7 +267,7 @@ Test the Prowl client.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="test_retrieve_token_valid"></a><span class="summary-sig-name">test_retrieve_token_valid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test retrieve_token with a valid providerkey.</td>
+      Test prowl.Client.retrieve_token with a valid developer key.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_retrieve_token_valid">source&nbsp;code</a></span>
             
@@ -230,7 +284,7 @@ Test the Prowl client.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="test_retrieve_token_invalid"></a><span class="summary-sig-name">test_retrieve_token_invalid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test retrieve_token with an invalid providerkey.</td>
+      Test prowl.Client.retrieve_token with an invalid providerkey.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_retrieve_token_invalid">source&nbsp;code</a></span>
             
@@ -247,7 +301,7 @@ Test the Prowl client.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="test_verify_user_valid"></a><span class="summary-sig-name">test_verify_user_valid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test verify_user with a valid API key.</td>
+      Test prowl.Client.verify_user with a valid API key.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_verify_user_valid">source&nbsp;code</a></span>
             
@@ -264,7 +318,7 @@ Test the Prowl client.
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="test_verify_user_invalid"></a><span class="summary-sig-name">test_verify_user_invalid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test verify_user with invalid API keys.</td>
+      Test prowl.Client.verify_user with invalid API keys.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#ProwlTest.test_verify_user_invalid">source&nbsp;code</a></span>
             
@@ -518,7 +572,7 @@ Hook method for setting up the test fixture before exercising it.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Sep 19 23:22:11 2012
+    Generated by Epydoc 3.0.1 on Wed Oct  3 20:44:50 2012
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

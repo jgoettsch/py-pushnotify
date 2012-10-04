@@ -63,9 +63,11 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class Client</h1><p class="nomargin-top"><span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-object --+
-         |
-        <strong class="uidshort">Client</strong>
+             object --+    
+                      |    
+abstract.AbstractClient --+
+                          |
+                         <strong class="uidshort">Client</strong>
 </pre>
 
 <hr />
@@ -74,7 +76,14 @@ Client for sending push notifications to Android and iOS devices
 with the Pushover application installed.
 
 Member Vars:
-    token: A string containing a valid API token.
+    developerkey: A string containing a valid token for the Pushover
+        application.
+    application: A string containing the name of the application on
+        behalf of whom the Pushover client will be sending messages.
+        Not used by this client.
+    apikeys: A dictionary where the keys are strings containing
+        valid user identifier, and the values are lists of strings,
+        each containing a valid device identifier.
 
 </pre>
 
@@ -102,8 +111,8 @@ Member Vars:
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="pushnotify.pushover.Client-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">token</span>,
-        <span class="summary-sig-arg">users</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">developerkey</span>,
+        <span class="summary-sig-arg">application</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>)</span><br />
       Initialize the Pushover client.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client.__init__">source&nbsp;code</a></span>
@@ -120,29 +129,11 @@ Member Vars:
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="_parse_response"></a><span class="summary-sig-name">_parse_response</span>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a name="_parse_response_stream"></a><span class="summary-sig-name">_parse_response_stream</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">stream</span>,
         <span class="summary-sig-arg">verify</span>=<span class="summary-sig-default">False</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client._parse_response">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="_post"></a><span class="summary-sig-name">_post</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">url</span>,
-        <span class="summary-sig-arg">data</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client._post">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client._parse_response_stream">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -173,10 +164,12 @@ Member Vars:
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="pushnotify.pushover.Client-class.html#notify" class="summary-sig-name">notify</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">title</span>,
-        <span class="summary-sig-arg">message</span>,
+        <span class="summary-sig-arg">description</span>,
+        <span class="summary-sig-arg">event</span>,
+        <span class="summary-sig-arg">split</span>=<span class="summary-sig-default">True</span>,
         <span class="summary-sig-arg">kwargs</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Send a notification to each user/device in self.users.</td>
+      Send a notification to each user/device combintation in
+self.apikeys.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client.notify">source&nbsp;code</a></span>
             
@@ -193,8 +186,8 @@ Member Vars:
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="pushnotify.pushover.Client-class.html#verify_user" class="summary-sig-name">verify_user</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">user</span>)</span><br />
-      Verify a user token.</td>
+        <span class="summary-sig-arg">apikey</span>)</span><br />
+      Verify a user identifier.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client.verify_user">source&nbsp;code</a></span>
             
@@ -211,9 +204,9 @@ Member Vars:
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="pushnotify.pushover.Client-class.html#verify_device" class="summary-sig-name">verify_device</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">user</span>,
-        <span class="summary-sig-arg">device</span>)</span><br />
-      Verify a device for a user.</td>
+        <span class="summary-sig-arg">apikey</span>,
+        <span class="summary-sig-arg">device_key</span>)</span><br />
+      Verify a device identifier for the user given by apikey.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client.verify_device">source&nbsp;code</a></span>
             
@@ -225,6 +218,16 @@ Member Vars:
   </tr>
   <tr>
     <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>abstract.AbstractClient</code></b>:
+      <code>add_key</code>,
+      <code>del_key</code>,
+      <code>retrieve_apikey</code>,
+      <code>retrieve_token</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>abstract.AbstractClient</code></b> (private):
+      <code>_get</code>,
+      <code>_post</code>
+      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
       <code>__format__</code>,
@@ -293,8 +296,8 @@ Member Vars:
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">token</span>,
-        <span class="sig-arg">users</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">developerkey</span>,
+        <span class="sig-arg">application</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -306,13 +309,11 @@ Member Vars:
 Initialize the Pushover client.
 
 Args:
-    token: A string of 30 characters containing a valid API
-        token.
-    users: A list containing 1 or 2-item tuples, where the first
-        item is a string of 30 characters containing a user
-        token, and the second is an optional string of up to 25
-        characters containing a device name for the given user.
-        (default: None)
+    developerkey: A string containing a valid token for the
+        Pushover application.
+    application: A string containing the name of the application
+        on behalf of whom the Pushover client will be sending
+        messages. Not used by this client. (default: '')
 
 </pre>
   <dl class="fields">
@@ -330,8 +331,9 @@ Args:
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">notify</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">title</span>,
-        <span class="sig-arg">message</span>,
+        <span class="sig-arg">description</span>,
+        <span class="sig-arg">event</span>,
+        <span class="sig-arg">split</span>=<span class="sig-default">True</span>,
         <span class="sig-arg">kwargs</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
@@ -340,17 +342,21 @@ Args:
   </tr></table>
   
   <pre class="literalblock">
-Send a notification to each user/device in self.users.
+Send a notification to each user/device combintation in
+self.apikeys.
 
 As of 2012-09-18, this is not returning a 4xx status code as
 per the Pushover API docs, but instead chopping the delivered
 messages off at 512 characters.
 
 Args:
-    title: A string of up to 100 characters containing the
-        title of the message (i.e. subject or brief description)
-    message: A string of up to 512 characters containing the
-        notification text.
+    description: A string of up to DESC_LIMIT characters
+        containing the notification text.
+    event: A string of up to 100 characters containing a
+        subject or brief description of the event.
+    split: A boolean indicating whether to split long
+        descriptions among multiple notifications (True) or to
+        possibly raise an exception (False). (default True)
     kwargs: A dictionary with any of the following strings as
             keys:
         priority: The integer 1, which will make the
@@ -371,6 +377,9 @@ Raises:
 
 </pre>
   <dl class="fields">
+    <dt>Overrides:
+        abstract.AbstractClient.notify
+    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -382,7 +391,7 @@ Raises:
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">verify_user</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">user</span>)</span>
+        <span class="sig-arg">apikey</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client.verify_user">source&nbsp;code</a></span>&nbsp;
@@ -390,17 +399,20 @@ Raises:
   </tr></table>
   
   <pre class="literalblock">
-Verify a user token.
+Verify a user identifier.
 
 Args:
-    user: A string containing a valid user token.
+    apikey: A string containing a user identifer.
 
 Returns:
-    A boolean containing True if the user token is valid, and
+    A boolean containing True if apikey is valid, and
     False if it is not.
 
 </pre>
   <dl class="fields">
+    <dt>Overrides:
+        abstract.AbstractClient.verify_user
+    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -412,8 +424,8 @@ Returns:
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">verify_device</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">user</span>,
-        <span class="sig-arg">device</span>)</span>
+        <span class="sig-arg">apikey</span>,
+        <span class="sig-arg">device_key</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="pushnotify.pushover-pysrc.html#Client.verify_device">source&nbsp;code</a></span>&nbsp;
@@ -421,21 +433,24 @@ Returns:
   </tr></table>
   
   <pre class="literalblock">
-Verify a device for a user.
+Verify a device identifier for the user given by apikey.
 
 Args:
-    user: A string containing a valid user token.
-    device: A string containing a device name.
+    apikey: A string containing a user identifer.
+    device_key: A string containing a device identifier.
 
 Raises:
     pushnotify.exceptions.ApiKeyError
 
 Returns:
-    A boolean containing True if the device is valid, and
-    False if it is not.
+    A boolean containing True if device_key is valid for
+    apikey, and False if it is not.
 
 </pre>
   <dl class="fields">
+    <dt>Overrides:
+        abstract.AbstractClient.verify_device
+    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -471,7 +486,7 @@ Returns:
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Sep 19 23:22:11 2012
+    Generated by Epydoc 3.0.1 on Wed Oct  3 20:44:50 2012
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
