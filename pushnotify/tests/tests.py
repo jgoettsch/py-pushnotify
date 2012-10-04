@@ -17,6 +17,8 @@ from pushnotify import abstract
 from pushnotify import get_client
 from pushnotify import exceptions
 from pushnotify import nma
+from pushnotify import prowl
+from pushnotify import pushover
 
 try:
     imp.find_module('nmakeys', [os.path.dirname(__file__)])
@@ -45,6 +47,42 @@ except ImportError:
 else:
     from pushnotify.tests.pushoverkeys import TOKEN as PUSHOVER_TOKEN
     from pushnotify.tests.pushoverkeys import USER as PUSHOVER_USER
+
+
+class PushnotifyTest(unittest.TestCase):
+
+    def setUp(self):
+
+        pass
+
+    def test_get_client_nma(self):
+        """Test get_client for type='nma'.
+
+        """
+
+        client = get_client('nma', NMA_DEVELOPER_KEY, 'pushnotify unit tests')
+        self.assertTrue(client._type == 'nma')
+        self.assertTrue(isinstance(client, nma.Client))
+
+    def test_get_client_prowl(self):
+        """Test get_client for type='prowl'.
+
+        """
+
+        client = get_client('prowl', PROWL_PROVIDER_KEY,
+                            'pushnotify unit tests')
+        self.assertTrue(client._type == 'prowl')
+        self.assertTrue(isinstance(client, prowl.Client))
+
+    def test_get_client_pushover(self):
+        """Test get_client for type='pushover'.
+
+        """
+
+        client = get_client('pushover', PUSHOVER_TOKEN,
+                            'pushnotify unit tests')
+        self.assertTrue(client._type == 'pushover')
+        self.assertTrue(isinstance(client, pushover.Client))
 
 
 class AbstractClientTest(unittest.TestCase):
