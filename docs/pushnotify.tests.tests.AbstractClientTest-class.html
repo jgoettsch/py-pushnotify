@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>pushnotify.tests.tests.PushoverTest</title>
+  <title>pushnotify.tests.tests.AbstractClientTest</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -45,7 +45,7 @@
         <a href="pushnotify-module.html">Package&nbsp;pushnotify</a> ::
         <a href="pushnotify.tests-module.html">Package&nbsp;tests</a> ::
         <a href="pushnotify.tests.tests-module.html">Module&nbsp;tests</a> ::
-        Class&nbsp;PushoverTest
+        Class&nbsp;AbstractClientTest
       </span>
     </td>
     <td>
@@ -55,25 +55,25 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="pushnotify.tests.tests.PushoverTest-class.html"
+            >]&nbsp;|&nbsp;<a href="pushnotify.tests.tests.AbstractClientTest-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class PushoverTest</h1><p class="nomargin-top"><span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class AbstractClientTest</h1><p class="nomargin-top"><span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#AbstractClientTest">source&nbsp;code</a></span></p>
 <pre class="base-tree">
             object --+    
                      |    
 unittest.case.TestCase --+
                          |
-                        <strong class="uidshort">PushoverTest</strong>
+                        <strong class="uidshort">AbstractClientTest</strong>
 </pre>
 
 <hr />
 <pre class="literalblock">
-Test the Pushover client.
+Test the AbstractClient class.
 
     
 
@@ -127,10 +127,10 @@ Test the Pushover client.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pushnotify.tests.tests.PushoverTest-class.html#setUp" class="summary-sig-name">setUp</a>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a href="pushnotify.tests.tests.AbstractClientTest-class.html#setUp" class="summary-sig-name">setUp</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Hook method for setting up the test fixture before exercising it.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.setUp">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#AbstractClientTest.setUp">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -144,10 +144,10 @@ Test the Pushover client.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="test_notify_valid"></a><span class="summary-sig-name">test_notify_valid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.notify with a valid notification.</td>
+          <td><span class="summary-sig"><a name="test_add_key_apikey"></a><span class="summary-sig-name">test_add_key_apikey</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Test the add_key method with an apikey.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_notify_valid">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#AbstractClientTest.test_add_key_apikey">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -161,11 +161,10 @@ Test the Pushover client.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="test_notify_valid_split"></a><span class="summary-sig-name">test_notify_valid_split</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.notify with a valid notification,
-splitting up a long description.</td>
+          <td><span class="summary-sig"><a name="test_add_key_device_key"></a><span class="summary-sig-name">test_add_key_device_key</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Test the add_key method with a device_key.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_notify_valid_split">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#AbstractClientTest.test_add_key_device_key">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -179,10 +178,9 @@ splitting up a long description.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="test_notify_invalid_developerkey"></a><span class="summary-sig-name">test_notify_invalid_developerkey</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.notify with an invalid developer key.</td>
+          <td><span class="summary-sig"><a name="test_del_key_apikey"></a><span class="summary-sig-name">test_del_key_apikey</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_notify_invalid_developerkey">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#AbstractClientTest.test_del_key_apikey">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -196,130 +194,9 @@ splitting up a long description.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="test_notify_invalid_apikey"></a><span class="summary-sig-name">test_notify_invalid_apikey</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.notify with an invalid API key.</td>
+          <td><span class="summary-sig"><a name="test_del_key_device_key"></a><span class="summary-sig-name">test_del_key_device_key</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_notify_invalid_apikey">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="test_notify_invalid_device_key"></a><span class="summary-sig-name">test_notify_invalid_device_key</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.notify with an invalid device key.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_notify_invalid_device_key">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="test_notify_invalid_argument_lengths"></a><span class="summary-sig-name">test_notify_invalid_argument_lengths</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.notify with invalid argument lengths.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_notify_invalid_argument_lengths">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="test_verify_user_valid"></a><span class="summary-sig-name">test_verify_user_valid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.verify_user with a valid API key.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_verify_user_valid">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="test_verify_user_invalid"></a><span class="summary-sig-name">test_verify_user_invalid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.verify_user with an invalid API key.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_verify_user_invalid">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="test_verify_device_valid"></a><span class="summary-sig-name">test_verify_device_valid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.verify_device with a valid device key.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_verify_device_valid">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="test_verify_device_invalid"></a><span class="summary-sig-name">test_verify_device_invalid</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.verify_device with an invalid device
-key.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_verify_device_invalid">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="test_verify_device_invalid_apikey"></a><span class="summary-sig-name">test_verify_device_invalid_apikey</span>(<span class="summary-sig-arg">self</span>)</span><br />
-      Test pushover.Client.verify_device with an invalid API key.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.test_verify_device_invalid_apikey">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#AbstractClientTest.test_del_key_device_key">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -523,7 +400,7 @@ key.</td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">setUp</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#PushoverTest.setUp">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="pushnotify.tests.tests-pysrc.html#AbstractClientTest.setUp">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   

@@ -13,7 +13,7 @@ license: BSD, see LICENSE for details.
 
 import logging
 import pushnotify
-from pushnotify import nma
+from pushnotify import get_client
 
 
 def main():
@@ -41,16 +41,17 @@ def main():
     # an obviously invalid API Key
 
     apikey = '012345678901234567890123456789012345678901234567'
-    client = nma.Client([apikey])
 
-    app = 'pushnotify examples'
+    client = get_client('nma', application='pushnotify examples')
+    client.add_key(apikey)
+
     event = 'logging example'
     desc = 'testing the logging capabilities of the pushnotify package'
 
     # this will raise an exception because the API Key is invalid
 
     try:
-        client.notify(app, event, desc)
+        client.notify(desc, event, split=True)
     except pushnotify.exceptions.ApiKeyError:
         pass
 

@@ -11,15 +11,13 @@ license: BSD, see LICENSE for details.
 """
 
 
-import logging
-import urllib
-import urllib2
 try:
     from xml.etree import cElementTree
     ElementTree = cElementTree
 except ImportError:
     from xml.etree import ElementTree
 
+from pushnotify import abstract
 from pushnotify import exceptions
 
 
@@ -29,78 +27,66 @@ NOTIFY_URL = u'/'.join([PUBLIC_API_URL, 'add'])
 RETRIEVE_TOKEN_URL = u'/'.join([PUBLIC_API_URL, 'retrieve', 'token'])
 RETRIEVE_APIKEY_URL = u'/'.join([PUBLIC_API_URL, 'retrieve', 'apikey'])
 
+DESC_LIMIT = 10000
 
-class Client(object):
+
+class Client(abstract.AbstractClient):
     """Client for sending push notificiations to iOS devices with
     the Prowl application installed.
 
     Member Vars:
-        apikeys: A list of strings, each containing a 40 character api
-            key.
-        providerkey: A string containing a 40 character provider key.
+        developerkey: A string containing a valid provider key for the
+            Prowl application.
+        application: A string containing the name of the application on
+            behalf of whom the Prowl client will be sending messages.
+        apikeys: A dictionary where the keys are strings containing
+            valid user API keys, and the values are lists of strings,
+            each containing a valid user device key. Device keys are not
+            used by this client.
 
     """
 
-    def __init__(self, apikeys=None, providerkey=None):
+    def __init__(self, developerkey='', application=''):
         """Initialize the Prowl client.
 
         Args:
-            apikeys:  A list of strings of 40 characters each, each
-                containing a valid api key.
-            providerkey: A string of 40 characters containing a valid
-                provider key.
+            developerkey: A string containing a valid provider key for
+                the Prowl application.
+            application: A string containing the name of the application
+                on behalf of whom the Prowl client will be sending
+                messages.
 
         """
 
-        self.logger = logging.getLogger('{0}.{1}'.format(
-            self.__module__, self.__class__.__name__))
+        super(self.__class__, self).__init__(developerkey, application)
 
-        self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
-        self._last_type = None
-        self._last_code = None
-        self._last_message = None
-        self._last_remaining = None
-        self._last_resetdate = None
-        self._last_token = None
-        self._last_token_url = None
-        self._last_apikey = None
+        self._type = 'prowl'
+        self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL,
+                      'retrieve_token': RETRIEVE_TOKEN_URL,
+                      'retrieve_apikey': RETRIEVE_APIKEY_URL}
 
-        self.apikeys = [] if apikeys is None else apikeys
-        self.providerkey = providerkey
+    def _parse_response_stream(self, response_stream, verify=False):
 
-    def _get(self, url):
-
-        self.logger.debug('_get requesting url: {0}'.format(url))
-
-        request = urllib2.Request(url)
-        try:
-            response_stream = self._browser.open(request)
-        except urllib2.HTTPError, exc:
-            return exc
-        else:
-            return response_stream
-
-    def _parse_response(self, response, verify=False):
-
-        xmlresp = response.read()
+        xmlresp = response_stream.read()
         self.logger.info('received response: {0}'.format(xmlresp))
 
         root = ElementTree.fromstring(xmlresp)
 
-        self._last_type = root[0].tag.lower()
-        self._last_code = root[0].attrib['code']
+        self._last['type'] = root[0].tag.lower()
+        self._last['code'] = root[0].attrib['code']
 
-        if self._last_type == 'success':
-            self._last_message = None
-            self._last_remaining = root[0].attrib['remaining']
-            self._last_resetdate = root[0].attrib['resetdate']
-        elif self._last_type == 'error':
-            self._last_message = root[0].text
-            self._last_remaining = None
-            self._last_resetdate = None
+        if self._last['type'] == 'success':
+            self._last['message'] = None
+            self._last['remaining'] = root[0].attrib['remaining']
+            self._last['resetdate'] = root[0].attrib['resetdate']
+        elif self._last['type'] == 'error':
+            self._last['message'] = root[0].text
+            self._last['remaining'] = None
+            self._last['resetdate'] = None
 
             if (not verify or
-                    (self._last_code != '400' and self._last_code != '401')):
+                    (self._last['code'] != '400' and
+                        self._last['code'] != '401')):
                 self._raise_exception()
         else:
             raise exceptions.UnrecognizedResponseError(xmlresp, -1)
@@ -108,13 +94,13 @@ class Client(object):
         if len(root) > 1:
             if root[1].tag.lower() == 'retrieve':
                 if 'token' in root[1].attrib:
-                    self._last_token = root[1].attrib['token']
-                    self._last_token_url = root[1].attrib['url']
-                    self._last_apikey = None
+                    self._last['token'] = root[1].attrib['token']
+                    self._last['token_url'] = root[1].attrib['url']
+                    self._last['apikey'] = None
                 elif 'apikey' in root[1].attrib:
-                    self._last_token = None
-                    self.last_token_url = None
-                    self._last_apikey = root[1].attrib['apikey']
+                    self._last['token'] = None
+                    self._last['token_url'] = None
+                    self._last['apikey'] = root[1].attrib['apikey']
                 else:
                     raise exceptions.UnrecognizedResponseError(xmlresp, -1)
             else:
@@ -122,55 +108,42 @@ class Client(object):
 
         return root
 
-    def _post(self, url, data):
-
-        self.logger.debug('_post sending data: {0}'.format(data))
-        self.logger.debug('_post sending to url: {0}'.format(url))
-
-        request = urllib2.Request(url, data)
-        try:
-            response_stream = self._browser.open(request)
-        except urllib2.HTTPError, exc:
-            return exc
-        else:
-            return response_stream
-
     def _raise_exception(self):
 
-        if self._last_code == '400':
-            raise exceptions.FormatError(self._last_message,
-                                         int(self._last_code))
-        elif self._last_code == '401':
-            if 'provider' not in self._last_message.lower():
-                raise exceptions.ApiKeyError(self._last_message,
-                                             int(self._last_code))
+        if self._last['code'] == '400':
+            raise exceptions.FormatError(self._last['message'],
+                                         int(self._last['code']))
+        elif self._last['code'] == '401':
+            if 'provider' not in self._last['message'].lower():
+                raise exceptions.ApiKeyError(self._last['message'],
+                                             int(self._last['code']))
             else:
-                raise exceptions.ProviderKeyError(self._last_message,
-                                                  int(self._last_code))
-        elif self._last_code == '406':
-            raise exceptions.RateLimitExceeded(self._last_message,
-                                               int(self._last_code))
-        elif self._last_code == '409':
-            raise exceptions.PermissionDenied(self._last_message,
-                                              int(self._last_code))
-        elif self._last_code == '500':
-            raise exceptions.ServerError(self._last_message,
-                                         int(self._last_code))
+                raise exceptions.ProviderKeyError(self._last['message'],
+                                                  int(self._last['code']))
+        elif self._last['code'] == '406':
+            raise exceptions.RateLimitExceeded(self._last['message'],
+                                               int(self._last['code']))
+        elif self._last['code'] == '409':
+            raise exceptions.PermissionDenied(self._last['message'],
+                                              int(self._last['code']))
+        elif self._last['code'] == '500':
+            raise exceptions.ServerError(self._last['message'],
+                                         int(self._last['code']))
         else:
-            raise exceptions.UnknownError(self._last_message,
-                                          int(self._last_code))
+            raise exceptions.UnknownError(self._last['message'],
+                                          int(self._last['code']))
 
-    def notify(self, app, event, desc, kwargs=None):
-        """Send a notification to each apikey in self.apikeys.
+    def notify(self, description, event, split=True, kwargs=None):
+        """Send a notification to each user's apikey in self.apikeys.
 
         Args:
-            app: A string of up to 256 characters containing the name
-                of the application sending the notification.
-            event: A string of up to 1024 characters containing the
-                event that is being notified (i.e. subject or brief
-                description.)
-            desc: A string of up to 10000 characters containing the
-                notification text.
+            description: A string of up to DESC_LIMIT characters
+                containing the notification text.
+            event: A string of up to 1024 characters containing a
+                subject or brief description of the event.
+            split: A boolean indicating whether to split long
+                descriptions among multiple notifications (True) or to
+                possibly raise an exception (False). (default True)
             kwargs: A dictionary with any of the following strings as
                     keys:
                 priority: An integer between -2 and 2, indicating the
@@ -181,8 +154,8 @@ class Client(object):
                 (default: None)
 
         Raises:
-            pushnotify.exceptions.FormatError
             pushnotify.exceptions.ApiKeyError
+            pushnotify.exceptions.FormatError
             pushnotify.exceptions.RateLimitExceeded
             pushnotify.exceptions.ServerError
             pushnotify.exceptions.UnknownError
@@ -190,30 +163,41 @@ class Client(object):
 
         """
 
-        data = {'apikey': ','.join(self.apikeys),
-                'application': app,
-                'event': event,
-                'description': desc}
+        def send_notify(description, event, kwargs):
+            data = {'apikey': ','.join(self.apikeys),
+                    'application': self.application,
+                    'event': event,
+                    'description': description}
 
-        if self.providerkey:
-            data['providerkey'] = self.providerkey
+            if self.developerkey:
+                data['providerkey'] = self.developerkey
 
-        if kwargs:
-            data.update(kwargs)
+            if kwargs:
+                data.update(kwargs)
 
-        data = urllib.urlencode(data)
+            response_stream = self._post(self._urls['notify'], data)
+            self._parse_response_stream(response_stream)
 
-        response = self._post(NOTIFY_URL, data)
-        self._parse_response(response)
+        if not self.apikeys:
+            self.logger.warn('notify called with no users set')
+            return
 
-    def retrieve_apikey(self, token):
-        """Get an API key for a given token.
+        if split:
+            while description:
+                this_desc = description[0:DESC_LIMIT]
+                description = description[DESC_LIMIT:]
+                send_notify(this_desc, event, kwargs)
+        else:
+            send_notify(description, event, kwargs)
+
+    def retrieve_apikey(self, reg_token):
+        """Get a user's API key for a given registration token.
 
         Once a user has approved you sending them push notifications,
         you can supply the returned token here and get an API key.
 
         Args:
-            token: A string containing a registration token returned
+            reg_token: A string containing a registration token returned
                 from the retrieve_token method.
 
         Raises:
@@ -224,22 +208,19 @@ class Client(object):
 
         """
 
-        data = {'providerkey': self.providerkey,
-                'token': token}
+        data = {'providerkey': self.developerkey,
+                'token': reg_token}
 
-        querystring = urllib.urlencode(data)
-        url = '?'.join([RETRIEVE_APIKEY_URL, querystring])
+        response_stream = self._get(self._urls['retrieve_apikey'], data)
+        self._parse_response_stream(response_stream)
 
-        response = self._get(url)
-        self._parse_response(response)
-
-        return self._last_apikey
+        return self._last['apikey']
 
     def retrieve_token(self):
         """Get a registration token and approval URL.
 
-        A user follows the URL and logs in to the Prowl website to
-        approve you sending them push notifications. If you've
+        A user follows the approval URL and logs in to the Prowl website
+        to approve you sending them push notifications. If you have
         associated a 'Retrieve success URL' with your provider key, they
         will be redirected there.
 
@@ -252,21 +233,19 @@ class Client(object):
             containing the associated URL.
         """
 
-        data = {'providerkey': self.providerkey}
+        data = {'providerkey': self.developerkey}
 
-        querystring = urllib.urlencode(data)
-        url = '?'.join([RETRIEVE_TOKEN_URL, querystring])
+        response_stream = self._get(self._urls['retrieve_token'], data)
+        self._parse_response_stream(response_stream)
 
-        response = self._get(url)
-        self._parse_response(response)
-
-        return self._last_token, self._last_token_url
+        return self._last['token'], self._last['token_url']
 
     def verify_user(self, apikey):
-        """Verify an API key for a user.
+        """Verify a user's API key.
 
         Args:
-            apikey: A string of 40 characters containing an API key.
+            apikey: A string of 40 characters containing a user's API
+                key.
 
         Raises:
             pushnotify.exceptions.RateLimitExceeded
@@ -275,23 +254,20 @@ class Client(object):
             pushnotify.exceptions.UnrecognizedResponseError
 
         Returns:
-            A boolean containing True if the API key is valid, and False
-            if it is not.
+            A boolean containing True if the user's API key is valid,
+            and False if it is not.
 
         """
 
         data = {'apikey': apikey}
 
-        if self.providerkey:
-            data['providerkey'] = self.providerkey
+        if self.developerkey:
+            data['providerkey'] = self.developerkey
 
-        querystring = urllib.urlencode(data)
-        url = '?'.join([VERIFY_URL, querystring])
+        response_stream = self._get(self._urls['verify'], data)
+        self._parse_response_stream(response_stream, True)
 
-        response = self._get(url)
-        self._parse_response(response, True)
-
-        return self._last_code == '200'
+        return self._last['code'] == '200'
 
 if __name__ == '__main__':
     pass

@@ -13,6 +13,8 @@ import imp
 import os
 import unittest
 
+from pushnotify import abstract
+from pushnotify import get_client
 from pushnotify import exceptions
 from pushnotify import nma
 from pushnotify import prowl
@@ -45,7 +47,96 @@ except ImportError:
 else:
     from pushnotify.tests.pushoverkeys import TOKEN as PUSHOVER_TOKEN
     from pushnotify.tests.pushoverkeys import USER as PUSHOVER_USER
-    from pushnotify.tests.pushoverkeys import DEVICE as PUSHOVER_DEVICE
+
+
+class PushnotifyTest(unittest.TestCase):
+
+    def setUp(self):
+
+        pass
+
+    def test_get_client_nma(self):
+        """Test get_client for type='nma'.
+
+        """
+
+        client = get_client('nma', NMA_DEVELOPER_KEY, 'pushnotify unit tests')
+        self.assertTrue(client._type == 'nma')
+        self.assertTrue(isinstance(client, nma.Client))
+
+    def test_get_client_prowl(self):
+        """Test get_client for type='prowl'.
+
+        """
+
+        client = get_client('prowl', PROWL_PROVIDER_KEY,
+                            'pushnotify unit tests')
+        self.assertTrue(client._type == 'prowl')
+        self.assertTrue(isinstance(client, prowl.Client))
+
+    def test_get_client_pushover(self):
+        """Test get_client for type='pushover'.
+
+        """
+
+        client = get_client('pushover', PUSHOVER_TOKEN,
+                            'pushnotify unit tests')
+        self.assertTrue(client._type == 'pushover')
+        self.assertTrue(isinstance(client, pushover.Client))
+
+
+class AbstractClientTest(unittest.TestCase):
+    """Test the AbstractClient class.
+
+    """
+
+    def setUp(self):
+
+        self.client = abstract.AbstractClient()
+
+    def test_add_key_apikey(self):
+        """Test the add_key method with an apikey.
+
+        """
+
+        apikey = 'foo'
+        self.assertTrue(apikey not in self.client.apikeys.keys())
+
+        self.client.add_key(apikey)
+        self.assertTrue(apikey in self.client.apikeys.keys())
+
+    def test_add_key_device_key(self):
+        """Test the add_key method with a device_key.
+
+        """
+
+        apikey = 'foo'
+        self.client.add_key('foo')
+
+        device_key = 'bar'
+        self.assertTrue(device_key not in self.client.apikeys[apikey])
+
+        self.client.add_key(apikey, device_key)
+        self.assertTrue(device_key in self.client.apikeys[apikey])
+
+    def test_del_key_apikey(self):
+
+        apikey = 'foo'
+        self.client.add_key(apikey)
+        self.assertTrue(apikey in self.client.apikeys.keys())
+
+        self.client.del_key(apikey)
+        self.assertTrue(apikey not in self.client.apikeys.keys())
+
+    def test_del_key_device_key(self):
+
+        apikey = 'foo'
+        device_key = 'bar'
+        self.client.add_key(apikey, device_key)
+        self.assertTrue(device_key in self.client.apikeys[apikey])
+
+        self.client.del_key(apikey, device_key)
+        self.assertTrue(device_key not in self.client.apikeys[apikey])
 
 
 class NMATest(unittest.TestCase):
@@ -55,80 +146,78 @@ class NMATest(unittest.TestCase):
 
     def setUp(self):
 
-        self.client = nma.Client(NMA_API_KEYS, NMA_DEVELOPER_KEY)
+        self.client = get_client('nma', NMA_DEVELOPER_KEY,
+                                 'pushnotify unit tests')
 
-        self.app = 'pushnotify unit tests'
+        for key in NMA_API_KEYS:
+            self.client.add_key(key)
+
         self.event = 'unit test: test_notify'
         self.desc = 'valid notification test for pushnotify'
 
     def test_notify_valid(self):
-        """Test notify with valid notifications.
+        """Test nma.Client.notify with a valid notification.
 
         """
 
-        # valid notification
-
-        self.client.notify(self.app, self.event, self.desc)
-
-        # valid notification, extra arguments, html
-
         html_desc = '<h1>{0}</h1><p>{1}<br>{2}</p>'.format(
-            self.app, self.event, self.desc)
+            self.client.application, self.desc, self.event)
         priority = 0
         url = nma.NOTIFY_URL
 
-        self.client.notify(self.app, self.event, html_desc,
+        self.client.notify(html_desc, self.event, split=False,
                            kwargs={'priority': priority, 'url': url,
                                    'content-type': 'text/html'})
 
-    def test_notify_invalid(self):
-        """Test notify with invalid notifications.
+    def test_notify_valid_split(self):
+        """Test nma.Client.notify with a valid notification, splitting
+        up a long description.
 
         """
 
-        # invalid API key
+        long_desc = 'a' * 10101
+        self.client.notify(long_desc, self.event, split=True)
 
-        char = self.client.apikeys[0][0]
-        apikey = self.client.apikeys[0].replace(char, '_')
-        self.client.apikeys = [apikey, ]
+    def test_notify_invalid_apikey(self):
+        """Test nma.Client.notify with an invalid API key.
+
+        """
+
+        char = self.client.apikeys.keys()[0][0]
+        apikey = self.client.apikeys.keys()[0].replace(char, '_')
+        self.client.apikeys = {}
+        self.client.add_key(apikey)
         self.client.developerkey = ''
 
         self.assertRaises(exceptions.ApiKeyError,
-                          self.client.notify, self.app, self.event, self.desc)
+                          self.client.notify, self.desc, self.event)
 
-        self.client.apikeys = NMA_API_KEYS
-        self.client.developerkey = NMA_DEVELOPER_KEY
+    def test_notify_invalid_argument_lengths(self):
+        """Test nma.Client.notify with invalid argument lengths.
 
-        # invalid argument lengths
+        """
 
-        bad_app = 'a' * 257
+        long_desc = 'a' * 10001
         self.assertRaises(exceptions.FormatError,
-                          self.client.notify, bad_app, self.event, self.desc)
+                          self.client.notify, long_desc, self.event,
+                          split=False)
 
-    def test_verify_valid(self):
-        """Test verify with a valid API key.
-
-        """
-
-        self.assertTrue(self.client.verify(self.client.apikeys[0]))
-
-    def test_verify_invalid(self):
-        """Test verify with invalid API keys.
+    def test_verify_user_valid(self):
+        """Test nma.Client.verify_user with a valid API key.
 
         """
 
-        # invalid API key of incorrect length
+        self.assertTrue(self.client.verify_user(self.client.apikeys.keys()[0]))
 
-        apikey = u'{0}{1}'.format(self.client.apikeys[0], '1')
+    def test_verify_user_invalid_apikey(self):
+        """Test nma.Client.verify_user with an invalid API key.
 
-        self.assertFalse(self.client.verify(apikey))
+        """
 
-        # invalid API key of correct length
+        char = self.client.apikeys.keys()[0][0]
+        apikey = self.client.apikeys.keys()[0].replace(char, '_')
 
-        char = self.client.apikeys[0][0]
-        apikey = self.client.apikeys[0].replace(char, '_')
-
-        self.assertFalse(self.client.verify(apikey))
+        self.assertFalse(self.client.verify_user(apikey))
 
 
 class ProwlTest(unittest.TestCase):
@@ -138,46 +227,57 @@ class ProwlTest(unittest.TestCase):
 
     def setUp(self):
 
-        self.client = prowl.Client(PROWL_API_KEYS, PROWL_PROVIDER_KEY)
+        self.client = get_client('prowl', PROWL_PROVIDER_KEY,
+                                 'pushnotify unit tests')
 
-        self.app = 'pushnotify unit tests'
+        for key in PROWL_API_KEYS:
+            self.client.add_key(key)
+
         self.event = 'unit test: test_notify'
         self.desc = 'valid notification test for pushnotify'
 
     def test_notify_valid(self):
-        """Test notify with a valid notification.
+        """Test prowl.Client.notify with valid notifications.
 
         """
 
-        self.client.notify(self.app, self.event, self.desc,
+        self.client.notify(self.desc, self.event, split=False,
                            kwargs={'priority': 0, 'url': 'http://google.com/'})
 
-    def test_notify_invalid(self):
-        """Test notify with invalid notifications.
+    def test_notify_valid_split(self):
+        """Test nma.Client.notify with a valid notification, splitting
+        up a long description.
 
         """
 
-        # invalid API key
+        long_desc = 'a' * 10101
+        self.client.notify(long_desc, self.event, split=True)
 
-        char = self.client.apikeys[0][0]
-        apikey = self.client.apikeys[0].replace(char, '_')
-        self.client.apikeys = [apikey, ]
+    def test_notify_invalid_apikey(self):
+        """Test prowl.Client.notify with an invalid API key.
+
+        """
+
+        char = self.client.apikeys.keys()[0][0]
+        apikey = self.client.apikeys.keys()[0].replace(char, '_')
+        self.client.apikeys = {}
+        self.client.add_key(apikey)
         self.client.developerkey = ''
 
         self.assertRaises(exceptions.ApiKeyError,
-                          self.client.notify, self.app, self.event, self.desc)
+                          self.client.notify, self.desc, self.event)
 
-        self.client.apikeys = NMA_API_KEYS
-        self.client.developerkey = NMA_DEVELOPER_KEY
+    def test_notify_invalid_argument_lengths(self):
+        """Test prowl.Client.notify with invalid argument lengths.
 
-        # invalid argument lengths
+        """
 
-        bad_app = 'a' * 257
+        bad_desc = 'a' * 10001
         self.assertRaises(exceptions.FormatError,
-                          self.client.notify, bad_app, self.event, self.desc)
+                          self.client.notify, bad_desc, self.event, False)
 
     def test_retrieve_apikey_valid(self):
-        """Test retrieve_apikey with a valid token.
+        """Test prowl.Client.retrieve_apikey with a valid token.
 
         """
 
@@ -185,24 +285,27 @@ class ProwlTest(unittest.TestCase):
         self.assertTrue(apikey)
         self.assertIs(type(apikey), str)
 
-    def test_retrieve_apikey_invalid(self):
-        """Test retrieve_apikey with an invalid token and provider key.
+    def test_retrieve_apikey_invalid_reg_token(self):
+        """Test prowl.Client.retrieve_apikey with an invalid
+        registration token.
 
         """
-
-        # invalid registration token
 
         self.assertRaises(exceptions.PermissionDenied,
                           self.client.retrieve_apikey, PROWL_REG_TOKEN[0:-1])
 
-        # invalid providerkey
+    def test_retrieve_apikey_invalid_developerkey(self):
+        """Test prowl.Client.retrieve_apikey with an invalid developer
+        key.
 
-        self.client.providerkey = self.client.providerkey[0:-1]
+        """
+
+        self.client.developerkey = self.client.developerkey[0:-1]
         self.assertRaises(exceptions.ProviderKeyError,
                           self.client.retrieve_apikey, PROWL_REG_TOKEN)
 
     def test_retrieve_token_valid(self):
-        """Test retrieve_token with a valid providerkey.
+        """Test prowl.Client.retrieve_token with a valid developer key.
 
         """
 
@@ -213,36 +316,28 @@ class ProwlTest(unittest.TestCase):
         self.assertIs(type(token[1]), str)
 
     def test_retrieve_token_invalid(self):
-        """Test retrieve_token with an invalid providerkey.
+        """Test prowl.Client.retrieve_token with an invalid providerkey.
 
         """
 
-        self.client.providerkey = self.client.providerkey[0:-1]
+        self.client.developerkey = self.client.developerkey[0:-1]
         self.assertRaises(exceptions.ProviderKeyError,
                           self.client.retrieve_token)
 
     def test_verify_user_valid(self):
-        """Test verify_user with a valid API key.
+        """Test prowl.Client.verify_user with a valid API key.
 
         """
 
-        self.assertTrue(self.client.verify_user(self.client.apikeys[0]))
+        self.assertTrue(self.client.verify_user(self.client.apikeys.keys()[0]))
 
     def test_verify_user_invalid(self):
-        """Test verify_user with invalid API keys.
+        """Test prowl.Client.verify_user with invalid API keys.
 
         """
 
-        # invalid API key of incorrect length
-
-        apikey = u'{0}{1}'.format(self.client.apikeys[0], '1')
-
-        self.assertFalse(self.client.verify_user(apikey))
-
-        # invalid API key of correct length
-
-        char = self.client.apikeys[0][0]
-        apikey = self.client.apikeys[0].replace(char, '_')
+        char = self.client.apikeys.keys()[0][0]
+        apikey = self.client.apikeys.keys()[0].replace(char, '_')
 
         self.assertFalse(self.client.verify_user(apikey))
 
@@ -254,60 +349,73 @@ class PushoverTest(unittest.TestCase):
 
     def setUp(self):
 
-        self.client = pushover.Client(PUSHOVER_TOKEN,
-                                      [(PUSHOVER_USER, PUSHOVER_DEVICE)])
+        self.client = get_client('pushover', PUSHOVER_TOKEN, '')
 
-        self.title = 'pushnotify unit tests'
-        self.message = 'valid notification test for pushnotify'
+        for key in PUSHOVER_USER.keys():
+            self.client.add_key(key, PUSHOVER_USER[key][0])
+
+        self.event = 'pushnotify unit tests'
+        self.desc = 'valid notification test for pushnotify'
 
     def test_notify_valid(self):
-        """Test notify with a valid notification.
+        """Test pushover.Client.notify with a valid notification.
 
         """
 
-        self.client.notify(self.title, self.message,
+        self.client.notify(self.desc, self.event, split=False,
                            kwargs={'priority': 1, 'url': 'http://google.com/',
                                    'url_title': 'Google'})
 
-    def test_notify_invalid_token(self):
-        """Test notify with an invalid token.
+    def test_notify_valid_split(self):
+        """Test pushover.Client.notify with a valid notification,
+        splitting up a long description.
 
         """
 
-        char = self.client.token[0]
-        bad_token = self.client.token.replace(char, '_')
-        self.client.token = bad_token
+        long_desc = 'a' * 513
+        self.client.notify(long_desc, self.event, split=True)
 
-        self.assertRaises(exceptions.ApiKeyError, self.client.notify,
-                          self.title, self.message)
-
-    def test_notify_invalid_user(self):
-        """Test notify with an invalid user.
+    def test_notify_invalid_developerkey(self):
+        """Test pushover.Client.notify with an invalid developer key.
 
         """
 
-        char = self.client.users[0][0][0]
-        bad_users = (self.client.users[0][0].replace(char, '_'),
-                     PUSHOVER_DEVICE)
-        self.client.users = bad_users
+        self.client.developerkey = '_' + self.client.developerkey[1:]
 
         self.assertRaises(exceptions.ApiKeyError, self.client.notify,
-                          self.title, self.message)
+                          self.desc, self.event)
 
-    def test_notify_invalid_device(self):
-        """Test notify with an invalid device.
+    def test_notify_invalid_apikey(self):
+        """Test pushover.Client.notify with an invalid API key.
 
         """
 
-        char = self.client.users[0][1][0]
-        bad_users = (PUSHOVER_USER, self.client.users[0][1].replace(char, '_'))
-        self.client.users = bad_users
+        apikey = self.client.apikeys.keys()[0]
+        device_key = self.client.apikeys[apikey][0]
+
+        apikey = '_' + apikey[1:]
+
+        self.client.apikeys = {}
+        self.client.add_key(apikey, device_key)
 
         self.assertRaises(exceptions.ApiKeyError, self.client.notify,
-                          self.title, self.message)
+                          self.desc, self.event)
 
-    def test_notify_invalid_args(self):
-        """Test notify with invalid argument lengths.
+    def test_notify_invalid_device_key(self):
+        """Test pushover.Client.notify with an invalid device key.
+
+        """
+
+        apikey = self.client.apikeys.keys()[0]
+
+        self.client.apikeys = {}
+        self.client.add_key(apikey, 'foo')
+
+        self.assertRaises(exceptions.ApiKeyError, self.client.notify,
+                          self.desc, self.event)
+
+    def test_notify_invalid_argument_lengths(self):
+        """Test pushover.Client.notify with invalid argument lengths.
 
         """
 
@@ -315,49 +423,57 @@ class PushoverTest(unittest.TestCase):
         # per the Pushover API docs, but instead chopping the delivered
         # messages off at 512 characters
 
-        msg = 'a' * 513
+        desc = 'a' * 513
 
         try:
-            self.client.notify(self.title, msg)
+            self.client.notify(desc, self.event, False)
         except exceptions.FormatError:
             pass
 
     def test_verify_user_valid(self):
-        """Test veriy_user with a valid user token.
+        """Test pushover.Client.verify_user with a valid API key.
 
         """
 
-        self.assertTrue(self.client.verify_user(PUSHOVER_USER))
+        self.assertTrue(self.client.verify_user(self.client.apikeys.keys()[0]))
 
     def test_verify_user_invalid(self):
-        """Test verify_user with an invalid user token.
+        """Test pushover.Client.verify_user with an invalid API key.
 
         """
 
         self.assertFalse(self.client.verify_user('foo'))
 
     def test_verify_device_valid(self):
-        """Test verify_device with a valid device string.
+        """Test pushover.Client.verify_device with a valid device key.
 
         """
 
-        self.assertTrue(self.client.verify_device(PUSHOVER_USER,
-                                                  PUSHOVER_DEVICE))
+        apikey = self.client.apikeys.keys()[0]
+        device_key = self.client.apikeys[apikey][0]
+
+        self.assertTrue(self.client.verify_device(apikey, device_key))
 
     def test_verify_device_invalid(self):
-        """Test verify_device with an invalid device string.
+        """Test pushover.Client.verify_device with an invalid device
+        key.
 
         """
 
-        self.assertFalse(self.client.verify_device(PUSHOVER_USER, 'foo'))
+        apikey = self.client.apikeys.keys()[0]
 
-    def test_verify_device_invalid_user(self):
-        """Test verify_device with an invalid user token.
+        self.assertFalse(self.client.verify_device(apikey, 'foo'))
+
+    def test_verify_device_invalid_apikey(self):
+        """Test pushover.Client.verify_device with an invalid API key.
 
         """
+
+        apikey = self.client.apikeys.keys()[0]
+        device_key = self.client.apikeys[apikey][0]
 
         self.assertRaises(exceptions.ApiKeyError, self.client.verify_device,
-                          'foo', PUSHOVER_DEVICE)
+                          'foo', device_key)
 
 
 if __name__ == '__main__':
