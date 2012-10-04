@@ -1,9 +1,9 @@
 Changelog
 ---------
 
-version 0.5 *(not yet released)*
+version 0.5
 
-* **backwards-incompatible change:** each client will conform to a
+* **backwards-incompatible change:** each client now conforms to a
   standard interface, and can be instantiated with the get_client
   factory method
 
