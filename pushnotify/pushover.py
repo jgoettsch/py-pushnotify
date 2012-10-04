@@ -54,7 +54,7 @@ class Client(abstract.AbstractClient):
 
         super(self.__class__, self).__init__(developerkey, application)
 
-        self._type = 'nma'
+        self._type = 'pushover'
         self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
     def _parse_response_stream(self, stream, verify=False):
