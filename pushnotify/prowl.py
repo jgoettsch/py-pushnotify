@@ -36,7 +36,7 @@ class Client(abstract.AbstractClient):
 
     Member Vars:
         developerkey: A string containing a valid provider key for the
-            given Prowl client.
+            Prowl application.
         application: A string containing the name of the application on
             behalf of whom the Prowl client will be sending messages.
         apikeys: A dictionary where the keys are strings containing
@@ -51,7 +51,7 @@ class Client(abstract.AbstractClient):
 
         Args:
             developerkey: A string containing a valid provider key for
-                the Prowl client.
+                the Prowl application.
             application: A string containing the name of the application
                 on behalf of whom the Prowl client will be sending
                 messages.

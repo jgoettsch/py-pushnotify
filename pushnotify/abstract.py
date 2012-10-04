@@ -19,7 +19,7 @@ class AbstractClient(object):
 
     Member Vars:
         developerkey: A string containing a valid developer key for the
-            given type_ of client.
+            client's application.
         application: A string containing the name of the application on
             behalf of whom the client will be sending messages.
         apikeys: A dictionary where the keys are strings containing
@@ -33,7 +33,7 @@ class AbstractClient(object):
 
         Args:
             developerkey: A string containing a valid developer key for
-                the given type_ of client.
+                the client's application.
             application: A string containing the name of the application
                 on behalf of whom the client will be sending messages.
 
@@ -87,7 +87,8 @@ class AbstractClient(object):
         """Add the given key to self.apikeys.
 
         Args:
-            apikey: A string containing a valid user's API key.
+            apikey: A string containing a valid user's API key for the
+                client's application.
             device_key: A string containing a valid device key to go
                 along with the API key. (default: '')
         """
@@ -105,10 +106,10 @@ class AbstractClient(object):
         keys. Otherwise only delete the device key.
 
         Args:
-            apikey: A string containing a valid user's API key in
-                self.apikeys.
-            device_key: A string containing a valid device key in
-                self.apikeys[apikey]. (default: '')
+            apikey: A string containing a valid user's API key that is
+                in self.apikeys.
+            device_key: A string containing a valid device key that is
+                in self.apikeys[apikey]. (default: '')
 
         """
 
@@ -119,6 +120,33 @@ class AbstractClient(object):
             del(self.apikeys[apikey])
 
     def notify(self, description, event, split=True, kwargs=None):
+        """Send a notification to each user/device combination in
+        self.apikeys.
+
+        Args:
+            description: A string containing the main notification text.
+                The maximum length varies by application. See each
+                client's documentation for details.
+            event: A string containing a subject or brief description of
+                the event. The maximum length varies by application. See
+                each client's documentation for details.
+            split: A boolean indicating whether to split long
+                descriptions among multiple notifications (True) or to
+                raise an exception if it is too long (False).
+                (default True)
+            kwargs: A dictionary for application specific options. See
+                each client's documentation for details.
+                (default: None)
+
+        Raises:
+            pushnotify.exceptions.ApiKeyError
+            pushnotify.exceptions.FormatError
+            pushnotify.exceptions.RateLimitExceeded
+            pushnotify.exceptions.ServerError
+            pushnotify.exceptions.UnknownError
+            pushnotify.exceptions.UnrecognizedResponseError
+
+        """
 
         raise NotImplementedError
 
@@ -131,9 +159,39 @@ class AbstractClient(object):
         raise NotImplementedError
 
     def verify_device(self, apikey, device_key):
+        """Verify a device identifier for the user given by apikey.
+
+        Args:
+            apikey: A string containing a user identifer.
+            device_key: A string containing a device identifier.
+
+        Raises:
+            pushnotify.exceptions.ApiKeyError
+
+        Returns:
+            A boolean containing True if device_key is valid for
+            apikey, and False if it is not.
+
+        """
 
         raise NotImplementedError
 
     def verify_user(self, apikey):
+        """Verify a user's API key.
+
+        Args:
+            apikey: A string containing a user's API key.
+
+        Raises:
+            pushnotify.exceptions.RateLimitExceeded
+            pushnotify.exceptions.ServerError
+            pushnotify.exceptions.UnknownError
+            pushnotify.exceptions.UnrecognizedResponseError
+
+        Returns:
+            A boolean containing True if the user's API key is valid,
+            and False if it is not.
+
+        """
 
         raise NotImplementedError

@@ -35,7 +35,7 @@ class Client(abstract.AbstractClient):
 
     Member Vars:
         developerkey: A string containing a valid developer key for the
-            NMA client.
+            NMA application.
         application: A string containing the name of the application on
             behalf of whom the NMA client will be sending messages.
         apikeys: A dictionary where the keys are strings containing
@@ -50,7 +50,7 @@ class Client(abstract.AbstractClient):
 
         Args:
             developerkey: A string containing a valid developer key for
-                the NMA client.
+                the NMA application.
             application: A string containing the name of the application
                 on behalf of whom the NMA client will be sending
                 messages.

@@ -30,13 +30,14 @@ class Client(abstract.AbstractClient):
     with the Pushover application installed.
 
     Member Vars:
-        developerkey: A string containing a valid provider key for the
-            given Pushover client.
+        developerkey: A string containing a valid token for the Pushover
+            application.
         application: A string containing the name of the application on
             behalf of whom the Pushover client will be sending messages.
+            Not used by this client.
         apikeys: A dictionary where the keys are strings containing
-            valid user API keys, and the values are lists of strings,
-            each containing a valid user device key.
+            valid user identifier, and the values are lists of strings,
+            each containing a valid device identifier.
 
     """
 
@@ -44,11 +45,11 @@ class Client(abstract.AbstractClient):
         """Initialize the Pushover client.
 
         Args:
-            developerkey: A string containing a valid provider key for
-                the Pushover client.
+            developerkey: A string containing a valid token for the
+                Pushover application.
             application: A string containing the name of the application
                 on behalf of whom the Pushover client will be sending
-                messages.
+                messages. Not used by this client. (default: '')
 
         """
 
@@ -122,8 +123,8 @@ class Client(abstract.AbstractClient):
             raise exceptions.UnrecognizedResponseError(msg, self._last['code'])
 
     def notify(self, description, event, split=True, kwargs=None):
-        """Send a notification to each user's API key/device key
-        combintation in self.apikeys.
+        """Send a notification to each user/device combintation in
+        self.apikeys.
 
         As of 2012-09-18, this is not returning a 4xx status code as
         per the Pushover API docs, but instead chopping the delivered
@@ -213,10 +214,10 @@ class Client(abstract.AbstractClient):
             self._raise_exception()
 
     def verify_user(self, apikey):
-        """Verify a user token.
+        """Verify a user identifier.
 
         Args:
-            apikey: A string containing a user's token.
+            apikey: A string containing a user identifer.
 
         Returns:
             A boolean containing True if apikey is valid, and
@@ -233,11 +234,11 @@ class Client(abstract.AbstractClient):
         return self._last['status']
 
     def verify_device(self, apikey, device_key):
-        """Verify a device for a user.
+        """Verify a device identifier for the user given by apikey.
 
         Args:
-            apikey: A string containing a user's token.
-            device_key: A string containing a device name.
+            apikey: A string containing a user identifer.
+            device_key: A string containing a device identifier.
 
         Raises:
             pushnotify.exceptions.ApiKeyError
