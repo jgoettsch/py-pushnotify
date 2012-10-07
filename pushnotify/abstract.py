@@ -8,9 +8,9 @@ license: BSD, see LICENSE for details.
 
 """
 
+import httplib2
 import logging
 import urllib
-import urllib2
 
 
 class AbstractClient(object):
@@ -49,7 +49,12 @@ class AbstractClient(object):
         self.application = application
         self.apikeys = {}
 
-        self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
+        # as of 2012-10-06, the pushover server does not pass SSL validation
+        # because httplib2 uses its own certificate store
+        # see: http://code.google.com/p/httplib2/issues/detail?id=154
+
+        self._browser = httplib2.Http(
+            '.cache', disable_ssl_certificate_validation=True)
         self._last = {}
         self._urls = {'notify': '', 'verify': ''}
 
@@ -60,28 +65,18 @@ class AbstractClient(object):
 
         self.logger.debug('_get requesting url: {0}'.format(url))
 
-        request = urllib2.Request(url)
-        try:
-            response_stream = self._browser.open(request)
-        except urllib2.HTTPError, exc:
-            return exc
-        else:
-            return response_stream
+        return self._browser.request(url, 'GET')
 
     def _post(self, url, data):
 
-        data = urllib.urlencode(data)
+        body = urllib.urlencode(data)
 
-        self.logger.debug('_post sending data: {0}'.format(data))
+        self.logger.debug('_post sending data: {0}'.format(body))
         self.logger.debug('_post sending to url: {0}'.format(url))
 
-        request = urllib2.Request(url, data)
-        try:
-            response_stream = self._browser.open(request)
-        except urllib2.HTTPError, exc:
-            return exc
-        else:
-            return response_stream
+        return self._browser.request(
+            url, 'POST', body,
+            headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
     def add_key(self, apikey, device_key=''):
         """Add the given key to self.apikeys.

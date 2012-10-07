@@ -65,12 +65,11 @@ class Client(abstract.AbstractClient):
                       'retrieve_token': RETRIEVE_TOKEN_URL,
                       'retrieve_apikey': RETRIEVE_APIKEY_URL}
 
-    def _parse_response_stream(self, response_stream, verify=False):
+    def _parse_response(self, content, verify=False):
 
-        xmlresp = response_stream.read()
-        self.logger.info('received response: {0}'.format(xmlresp))
+        self.logger.info('received response: {0}'.format(content))
 
-        root = ElementTree.fromstring(xmlresp)
+        root = ElementTree.fromstring(content)
 
         self._last['type'] = root[0].tag.lower()
         self._last['code'] = root[0].attrib['code']
@@ -89,7 +88,7 @@ class Client(abstract.AbstractClient):
                         self._last['code'] != '401')):
                 self._raise_exception()
         else:
-            raise exceptions.UnrecognizedResponseError(xmlresp, -1)
+            raise exceptions.UnrecognizedResponseError(content, -1)
 
         if len(root) > 1:
             if root[1].tag.lower() == 'retrieve':
@@ -102,9 +101,9 @@ class Client(abstract.AbstractClient):
                     self._last['token_url'] = None
                     self._last['apikey'] = root[1].attrib['apikey']
                 else:
-                    raise exceptions.UnrecognizedResponseError(xmlresp, -1)
+                    raise exceptions.UnrecognizedResponseError(content, -1)
             else:
-                raise exceptions.UnrecognizedResponseError(xmlresp, -1)
+                raise exceptions.UnrecognizedResponseError(content, -1)
 
         return root
 
@@ -175,8 +174,8 @@ class Client(abstract.AbstractClient):
             if kwargs:
                 data.update(kwargs)
 
-            response_stream = self._post(self._urls['notify'], data)
-            self._parse_response_stream(response_stream)
+            response = self._post(self._urls['notify'], data)
+            self._parse_response(response[1])
 
         if not self.apikeys:
             self.logger.warn('notify called with no users set')
@@ -211,8 +210,8 @@ class Client(abstract.AbstractClient):
         data = {'providerkey': self.developerkey,
                 'token': reg_token}
 
-        response_stream = self._get(self._urls['retrieve_apikey'], data)
-        self._parse_response_stream(response_stream)
+        response = self._get(self._urls['retrieve_apikey'], data)
+        self._parse_response(response[1])
 
         return self._last['apikey']
 
@@ -235,8 +234,8 @@ class Client(abstract.AbstractClient):
 
         data = {'providerkey': self.developerkey}
 
-        response_stream = self._get(self._urls['retrieve_token'], data)
-        self._parse_response_stream(response_stream)
+        response = self._get(self._urls['retrieve_token'], data)
+        self._parse_response(response[1])
 
         return self._last['token'], self._last['token_url']
 
@@ -264,8 +263,8 @@ class Client(abstract.AbstractClient):
         if self.developerkey:
             data['providerkey'] = self.developerkey
 
-        response_stream = self._get(self._urls['verify'], data)
-        self._parse_response_stream(response_stream, True)
+        response = self._get(self._urls['verify'], data)
+        self._parse_response(response[1], True)
 
         return self._last['code'] == '200'
 
