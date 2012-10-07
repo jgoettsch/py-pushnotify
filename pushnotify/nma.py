@@ -62,10 +62,9 @@ class Client(abstract.AbstractClient):
         self._type = 'nma'
         self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
-    def _parse_response_stream(self, response_stream, verify=False):
+    def _parse_response(self, content, verify=False):
 
-        xmlresp = response_stream.read()
-        root = ElementTree.fromstring(xmlresp)
+        root = ElementTree.fromstring(content)
 
         self._last['type'] = root[0].tag.lower()
         self._last['code'] = root[0].attrib['code']
@@ -84,7 +83,7 @@ class Client(abstract.AbstractClient):
                         self._last['code'] != '401')):
                 self._raise_exception()
         else:
-            raise exceptions.UnrecognizedResponseError(xmlresp, -1)
+            raise exceptions.UnrecognizedResponseError(content, -1)
 
         return root
 
@@ -151,8 +150,8 @@ class Client(abstract.AbstractClient):
             if kwargs:
                 data.update(kwargs)
 
-            response_stream = self._post(self._urls['notify'], data)
-            self._parse_response_stream(response_stream)
+            response = self._post(self._urls['notify'], data)
+            self._parse_response(response[1])
 
         if not self.apikeys:
             self.logger.warn('notify called with no users set')
@@ -201,8 +200,8 @@ class Client(abstract.AbstractClient):
         if self.developerkey:
             data['developerkey'] = self.developerkey
 
-        response_stream = self._get(self._urls['verify'], data)
-        self._parse_response_stream(response_stream, True)
+        response = self._get(self._urls['verify'], data)
+        self._parse_response(response[1], True)
 
         return self._last['code'] == '200'
 
