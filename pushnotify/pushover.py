@@ -66,26 +66,11 @@ class Client(abstract.AbstractClient):
         response = json.loads(response)
 
         self._last['code'] = stream.code
-        if 'device' in response.keys():
-            self._last['device'] = response['device']
-        else:
-            self._last['device'] = None
-        if 'errors' in response.keys():
-            self._last['errors'] = response['errors']
-        else:
-            self._last['errors'] = None
-        if 'status' in response.keys():
-            self._last['status'] = response['status']
-        else:
-            self._last['status'] = None
-        if 'token' in response.keys():
-            self._last['token'] = response['token']
-        else:
-            self._last['token'] = None
-        if 'user' in response.keys():
-            self._last['user'] = response['user']
-        else:
-            self._last['user'] = None
+        self._last['device'] = response.get('device', None)
+        self._last['errors'] = response.get('errors', None)
+        self._last['status'] = response.get('status', None)
+        self._last['token'] = response.get('token', None)
+        self._last['user'] = response.get('user', None)
 
         return self._last['status']
 
