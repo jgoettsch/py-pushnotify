@@ -1,27 +1,8 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8
 
-import re
 from setuptools import setup
 
-
-def parse_requirements():
-
-    requirements = []
-
-    with open('requirements.txt') as fh:
-        for line in fh.read().split('\n'):
-            if re.match(r'(\s*#)|(\s*$)', line):
-                continue
-            if re.match(r'\s*-e\s+', line):
-                requirements.append(
-                    re.sub(r'\s*-e\s+.*#egg=(.*)$', r'\1', line))
-            elif re.match(r'\s*-f\s+', line):
-                pass
-            else:
-                requirements.append(line)
-
-    return requirements
 
 version = '0.5p'
 
@@ -37,7 +18,6 @@ with open('CHANGELOG.rst') as fh:
 setup(
     name='pushnotify',
     packages=['pushnotify', 'pushnotify.tests'],
-    install_requires=parse_requirements(),
     version=version,
     author='Jeffrey Goettsch',
     author_email='jgoettsch+pypushnotify@gmail.com',

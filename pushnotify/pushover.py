@@ -58,18 +58,19 @@ class Client(abstract.AbstractClient):
         self._type = 'pushover'
         self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
-    def _parse_response(self, response, content, verify=False):
+    def _parse_response_stream(self, stream, verify=False):
 
-        self.logger.info('received response: {0}'.format(content))
+        response = stream.read()
+        self.logger.info('received response: {0}'.format(response))
 
-        content = json.loads(content)
+        response = json.loads(response)
 
-        self._last['code'] = response
-        self._last['device'] = content.get('device', None)
-        self._last['errors'] = content.get('errors', None)
-        self._last['status'] = content.get('status', None)
-        self._last['token'] = content.get('token', None)
-        self._last['user'] = content.get('user', None)
+        self._last['code'] = stream.code
+        self._last['device'] = response.get('device', None)
+        self._last['errors'] = response.get('errors', None)
+        self._last['status'] = response.get('status', None)
+        self._last['token'] = response.get('token', None)
+        self._last['user'] = response.get('user', None)
 
         return self._last['status']
 
@@ -158,8 +159,8 @@ class Client(abstract.AbstractClient):
                 if kwargs:
                     data.update(kwargs)
 
-                response, content = self._post(self._urls['notify'], data)
-                this_successful = self._parse_response(response, content)
+                response_stream = self._post(self._urls['notify'], data)
+                this_successful = self._parse_response_stream(response_stream)
 
                 all_successful = all_successful and this_successful
 
@@ -211,9 +212,9 @@ class Client(abstract.AbstractClient):
 
         data = {'token': self.developerkey, 'user': apikey}
 
-        response, content = self._post(self._urls['verify'], data)
+        response_stream = self._post(self._urls['verify'], data)
 
-        self._parse_response(response, content, True)
+        self._parse_response_stream(response_stream, True)
 
         return self._last['status']
 
@@ -236,9 +237,9 @@ class Client(abstract.AbstractClient):
         data = {'token': self.developerkey, 'user': apikey,
                 'device': device_key}
 
-        response, content = self._post(self._urls['verify'], data)
+        response_stream = self._post(self._urls['verify'], data)
 
-        self._parse_response(response, content, True)
+        self._parse_response_stream(response_stream, True)
 
         if self._last['user'] and 'invalid' in self._last['user'].lower():
             self._raise_exception()
