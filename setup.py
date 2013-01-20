@@ -4,6 +4,8 @@
 import re
 from setuptools import setup
 
+from pushnotify import __version__
+
 
 def parse_requirements(file_name):
 
@@ -31,8 +33,6 @@ def parse_dependency_links(file_name):
     return dependency_links
 
 
-version = '0.5p'
-
 with open('README.rst') as fh:
     long_description = fh.read()
 
@@ -45,7 +45,7 @@ with open('CHANGELOG.rst') as fh:
 setup(
     name='pushnotify',
     packages=['pushnotify', 'pushnotify.tests'],
-    version=version,
+    version=__version__,
     install_requires=parse_requirements('requirements.txt'),
     dependency_links=parse_dependency_links('requirements.txt'),
 
@@ -68,6 +68,6 @@ setup(
     description=('A package for sending push notifications to Android and '
                  'iOS devices.'),
     download_url=('https://bitbucket.org/jgoettsch/py-pushnotify/get/'
-                  '{0}.tar.gz').format(version),
+                  '{0}.tar.gz').format(__version__),
     long_description=long_description,
     url='https://bitbucket.org/jgoettsch/py-pushnotify/',)
