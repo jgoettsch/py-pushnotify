@@ -79,8 +79,8 @@ class Client(abstract.AbstractClient):
         msg = ''
         if self._last['errors']:
             messages = []
-            for key, value in self._last['errors'].items():
-                messages.append('{0} {1}'.format(key, value[0]))
+            for error in self._last['errors']:
+                messages.append(error)
             msg = '; '.join(messages)
 
         if self._last['device'] and 'invalid' in self._last['device']:
@@ -186,8 +186,7 @@ class Client(abstract.AbstractClient):
 
         for apikey, device_keys in self.apikeys.items():
             if not device_keys:
-                this_ok = send_notify(desc_list, event, kwargs,
-                                                   apikey)
+                this_ok = send_notify(desc_list, event, kwargs, apikey)
             else:
                 for device_key in device_keys:
                     this_ok = send_notify(
