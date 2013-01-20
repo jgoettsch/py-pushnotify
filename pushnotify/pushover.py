@@ -11,7 +11,6 @@ license: BSD, see LICENSE for details.
 """
 
 
-import json
 import time
 
 from pushnotify import abstract
@@ -58,14 +57,12 @@ class Client(abstract.AbstractClient):
         self._type = 'pushover'
         self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
-    def _parse_response_stream(self, stream, verify=False):
+    def _parse_response(self, stream, verify=False):
 
-        response = stream.read()
+        response = stream.json()
         self.logger.info('received response: {0}'.format(response))
 
-        response = json.loads(response)
-
-        self._last['code'] = stream.code
+        self._last['code'] = stream.status_code
         self._last['device'] = response.get('device', None)
         self._last['errors'] = response.get('errors', None)
         self._last['status'] = response.get('status', None)
@@ -159,8 +156,8 @@ class Client(abstract.AbstractClient):
                 if kwargs:
                     data.update(kwargs)
 
-                response_stream = self._post(self._urls['notify'], data)
-                this_successful = self._parse_response_stream(response_stream)
+                response = self._post(self._urls['notify'], data)
+                this_successful = self._parse_response(response)
 
                 all_successful = all_successful and this_successful
 
@@ -211,9 +208,9 @@ class Client(abstract.AbstractClient):
 
         data = {'token': self.developerkey, 'user': apikey}
 
-        response_stream = self._post(self._urls['verify'], data)
+        response = self._post(self._urls['verify'], data)
 
-        self._parse_response_stream(response_stream, True)
+        self._parse_response(response, True)
 
         return self._last['status']
 
@@ -236,9 +233,9 @@ class Client(abstract.AbstractClient):
         data = {'token': self.developerkey, 'user': apikey,
                 'device': device_key}
 
-        response_stream = self._post(self._urls['verify'], data)
+        response = self._post(self._urls['verify'], data)
 
-        self._parse_response_stream(response_stream, True)
+        self._parse_response(response, True)
 
         if self._last['user'] and 'invalid' in self._last['user'].lower():
             self._raise_exception()

@@ -9,8 +9,7 @@ license: BSD, see LICENSE for details.
 """
 
 import logging
-import urllib
-import urllib2
+import requests
 
 
 class AbstractClient(object):
@@ -49,39 +48,32 @@ class AbstractClient(object):
         self.application = application
         self.apikeys = {}
 
-        self._browser = urllib2.build_opener(urllib2.HTTPSHandler())
+        self._browser = requests.Session()
         self._last = {}
         self._urls = {'notify': '', 'verify': ''}
 
     def _get(self, url, data):
 
-        querystring = urllib.urlencode(data)
-        url = '?'.join([url, querystring])
-
         self.logger.debug('_get requesting url: {0}'.format(url))
 
-        request = urllib2.Request(url)
         try:
-            response_stream = self._browser.open(request)
-        except urllib2.HTTPError, exc:
+            response = self._browser.get(url, params=data)
+        except requests.exceptions.RequestException, exc:
             return exc
         else:
-            return response_stream
+            return response
 
     def _post(self, url, data):
-
-        data = urllib.urlencode(data)
 
         self.logger.debug('_post sending data: {0}'.format(data))
         self.logger.debug('_post sending to url: {0}'.format(url))
 
-        request = urllib2.Request(url, data)
         try:
-            response_stream = self._browser.open(request)
-        except urllib2.HTTPError, exc:
+            response = self._browser.post(url, data=data)
+        except requests.exceptions.RequestException, exc:
             return exc
         else:
-            return response_stream
+            return response
 
     def add_key(self, apikey, device_key=''):
         """Add the given key to self.apikeys.

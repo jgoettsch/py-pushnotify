@@ -62,9 +62,9 @@ class Client(abstract.AbstractClient):
         self._type = 'nma'
         self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
-    def _parse_response_stream(self, response_stream, verify=False):
+    def _parse_response(self, response, verify=False):
 
-        xmlresp = response_stream.read()
+        xmlresp = response.text
         root = ElementTree.fromstring(xmlresp)
 
         self._last['type'] = root[0].tag.lower()
@@ -151,8 +151,8 @@ class Client(abstract.AbstractClient):
             if kwargs:
                 data.update(kwargs)
 
-            response_stream = self._post(self._urls['notify'], data)
-            self._parse_response_stream(response_stream)
+            response = self._post(self._urls['notify'], data)
+            self._parse_response(response)
 
         if not self.apikeys:
             self.logger.warn('notify called with no users set')
@@ -201,8 +201,8 @@ class Client(abstract.AbstractClient):
         if self.developerkey:
             data['developerkey'] = self.developerkey
 
-        response_stream = self._get(self._urls['verify'], data)
-        self._parse_response_stream(response_stream, True)
+        response = self._get(self._urls['verify'], data)
+        self._parse_response(response, True)
 
         return self._last['code'] == '200'
 

@@ -65,9 +65,9 @@ class Client(abstract.AbstractClient):
                       'retrieve_token': RETRIEVE_TOKEN_URL,
                       'retrieve_apikey': RETRIEVE_APIKEY_URL}
 
-    def _parse_response_stream(self, response_stream, verify=False):
+    def _parse_response(self, response, verify=False):
 
-        xmlresp = response_stream.read()
+        xmlresp = response.text
         self.logger.info('received response: {0}'.format(xmlresp))
 
         root = ElementTree.fromstring(xmlresp)
@@ -175,8 +175,8 @@ class Client(abstract.AbstractClient):
             if kwargs:
                 data.update(kwargs)
 
-            response_stream = self._post(self._urls['notify'], data)
-            self._parse_response_stream(response_stream)
+            response = self._post(self._urls['notify'], data)
+            self._parse_response(response)
 
         if not self.apikeys:
             self.logger.warn('notify called with no users set')
@@ -211,8 +211,8 @@ class Client(abstract.AbstractClient):
         data = {'providerkey': self.developerkey,
                 'token': reg_token}
 
-        response_stream = self._get(self._urls['retrieve_apikey'], data)
-        self._parse_response_stream(response_stream)
+        response = self._get(self._urls['retrieve_apikey'], data)
+        self._parse_response(response)
 
         return self._last['apikey']
 
@@ -235,8 +235,8 @@ class Client(abstract.AbstractClient):
 
         data = {'providerkey': self.developerkey}
 
-        response_stream = self._get(self._urls['retrieve_token'], data)
-        self._parse_response_stream(response_stream)
+        response = self._get(self._urls['retrieve_token'], data)
+        self._parse_response(response)
 
         return self._last['token'], self._last['token_url']
 
@@ -264,8 +264,8 @@ class Client(abstract.AbstractClient):
         if self.developerkey:
             data['providerkey'] = self.developerkey
 
-        response_stream = self._get(self._urls['verify'], data)
-        self._parse_response_stream(response_stream, True)
+        response = self._get(self._urls['verify'], data)
+        self._parse_response(response, True)
 
         return self._last['code'] == '200'
 
