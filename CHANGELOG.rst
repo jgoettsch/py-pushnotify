@@ -1,6 +1,8 @@
 Changelog
 ---------
 
+* now uses the Requests instead of urllib2
+
 version 0.5
 
 * **backwards-incompatible change:** each client now conforms to a
