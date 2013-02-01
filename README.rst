@@ -30,6 +30,7 @@ To get started you can do the following::
     $ hg clone https://bitbucket.org/jgoettsch/py-pushnotify/
     $ cd py-pushnotify
     $ pip install -r requirements_dev.txt
+    $ python setup.py develop
 
 If you discover a bug, please create an issue ticket:
 
