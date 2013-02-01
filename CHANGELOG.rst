@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+For a full history of changes see the commit history:
+
+* https://bitbucket.org/jgoettsch/py-pushnotify/commits/all
+
+version 0.5.1
+
+* **license-change:** this and future versions are now licensed under
+  the GNU GPL v3.
+
 * now uses the Requests instead of urllib2
 
 version 0.5
