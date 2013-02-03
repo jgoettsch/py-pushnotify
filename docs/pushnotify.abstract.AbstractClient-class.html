@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>pushnotify.prowl.Client</title>
+  <title>pushnotify.abstract.AbstractClient</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -43,8 +43,8 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="pushnotify-module.html">Package&nbsp;pushnotify</a> ::
-        <a href="pushnotify.prowl-module.html">Module&nbsp;prowl</a> ::
-        Class&nbsp;Client
+        <a href="pushnotify.abstract-module.html">Module&nbsp;abstract</a> ::
+        Class&nbsp;AbstractClient
       </span>
     </td>
     <td>
@@ -54,36 +54,39 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="pushnotify.prowl.Client-class.html"
+            >]&nbsp;|&nbsp;<a href="pushnotify.abstract.AbstractClient-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class Client</h1><p class="nomargin-top"><span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class AbstractClient</h1><p class="nomargin-top"><span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-             object --+    
-                      |    
-<a href="pushnotify.abstract.AbstractClient-class.html">abstract.AbstractClient</a> --+
-                          |
-                         <strong class="uidshort">Client</strong>
+object --+
+         |
+        <strong class="uidshort">AbstractClient</strong>
 </pre>
+
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="pushnotify.pushover.Client-class.html">pushover.Client</a></li><li>, <a href="pushnotify.prowl.Client-class.html">prowl.Client</a></li><li>, <a href="pushnotify.nma.Client-class.html">nma.Client</a></li>  </ul>
+</dd></dl>
 
 <hr />
 <pre class="literalblock">
-Client for sending push notificiations to iOS devices with
-the Prowl application installed.
+Abstract client for sending push notifications. Inherit from this
+class but don't call it directly.
 
 Member Vars:
-    developerkey: A string containing a valid provider key for the
-        Prowl application.
+    developerkey: A string containing a valid developer key for the
+        client's application.
     application: A string containing the name of the application on
-        behalf of whom the Prowl client will be sending messages.
+        behalf of whom the client will be sending messages.
     apikeys: A dictionary where the keys are strings containing
         valid user API keys, and the values are lists of strings,
-        each containing a valid user device key. Device keys are not
-        used by this client.
+        each containing a valid user device key.
 
 </pre>
 
@@ -110,12 +113,12 @@ Member Vars:
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pushnotify.prowl.Client-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="pushnotify.abstract.AbstractClient-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">developerkey</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
         <span class="summary-sig-arg">application</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>)</span><br />
-      Initialize the Prowl client.</td>
+      Initialize the client.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.__init__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.__init__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -129,11 +132,11 @@ Member Vars:
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="_parse_response"></a><span class="summary-sig-name">_parse_response</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">response</span>,
-        <span class="summary-sig-arg">verify</span>=<span class="summary-sig-default">False</span>)</span></td>
+          <td><span class="summary-sig"><a name="_get"></a><span class="summary-sig-name">_get</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">url</span>,
+        <span class="summary-sig-arg">data</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client._parse_response">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient._get">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -147,9 +150,11 @@ Member Vars:
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="_raise_exception"></a><span class="summary-sig-name">_raise_exception</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a name="_post"></a><span class="summary-sig-name">_post</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">url</span>,
+        <span class="summary-sig-arg">data</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client._raise_exception">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient._post">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -163,14 +168,53 @@ Member Vars:
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pushnotify.prowl.Client-class.html#notify" class="summary-sig-name">notify</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="pushnotify.abstract.AbstractClient-class.html#add_key" class="summary-sig-name">add_key</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">apikey</span>,
+        <span class="summary-sig-arg">device_key</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>)</span><br />
+      Add the given key to self.apikeys.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.add_key">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pushnotify.abstract.AbstractClient-class.html#del_key" class="summary-sig-name">del_key</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">apikey</span>,
+        <span class="summary-sig-arg">device_key</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>)</span><br />
+      Delete the given API key or device key from self.apikeys.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.del_key">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pushnotify.abstract.AbstractClient-class.html#notify" class="summary-sig-name">notify</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">description</span>,
         <span class="summary-sig-arg">event</span>,
         <span class="summary-sig-arg">split</span>=<span class="summary-sig-default">True</span>,
         <span class="summary-sig-arg">kwargs</span>=<span class="summary-sig-default">None</span>)</span><br />
-      Send a notification to each user's apikey in self.apikeys.</td>
+      Send a notification to each user/device combination in
+self.apikeys.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.notify">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.notify">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -184,11 +228,10 @@ Member Vars:
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pushnotify.prowl.Client-class.html#retrieve_apikey" class="summary-sig-name">retrieve_apikey</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">reg_token</span>)</span><br />
-      Get a user's API key for a given registration token.</td>
+          <td><span class="summary-sig"><a name="retrieve_apikey"></a><span class="summary-sig-name">retrieve_apikey</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">reg_token</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.retrieve_apikey">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.retrieve_apikey">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -202,10 +245,9 @@ Member Vars:
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pushnotify.prowl.Client-class.html#retrieve_token" class="summary-sig-name">retrieve_token</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Get a registration token and approval URL.</td>
+          <td><span class="summary-sig"><a name="retrieve_token"></a><span class="summary-sig-name">retrieve_token</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.retrieve_token">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.retrieve_token">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -219,11 +261,30 @@ Member Vars:
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pushnotify.prowl.Client-class.html#verify_user" class="summary-sig-name">verify_user</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="pushnotify.abstract.AbstractClient-class.html#verify_device" class="summary-sig-name">verify_device</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">apikey</span>,
+        <span class="summary-sig-arg">device_key</span>)</span><br />
+      Verify a device identifier for the user given by apikey.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.verify_device">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pushnotify.abstract.AbstractClient-class.html#verify_user" class="summary-sig-name">verify_user</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">apikey</span>)</span><br />
       Verify a user's API key.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.verify_user">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.verify_user">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -233,15 +294,6 @@ Member Vars:
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pushnotify.abstract.AbstractClient-class.html">abstract.AbstractClient</a></code></b>:
-      <code><a href="pushnotify.abstract.AbstractClient-class.html#add_key">add_key</a></code>,
-      <code><a href="pushnotify.abstract.AbstractClient-class.html#del_key">del_key</a></code>,
-      <code><a href="pushnotify.abstract.AbstractClient-class.html#verify_device">verify_device</a></code>
-      </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="pushnotify.abstract.AbstractClient-class.html">abstract.AbstractClient</a></code></b> (private):
-      <code><a href="pushnotify.abstract.AbstractClient-class.html#_get" onclick="show_private();">_get</a></code>,
-      <code><a href="pushnotify.abstract.AbstractClient-class.html#_post" onclick="show_private();">_post</a></code>
-      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
       <code>__format__</code>,
@@ -315,25 +367,87 @@ Member Vars:
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.__init__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.__init__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
   <pre class="literalblock">
-Initialize the Prowl client.
+Initialize the client.
 
 Args:
-    developerkey: A string containing a valid provider key for
-        the Prowl application.
+    developerkey: A string containing a valid developer key for
+        the client's application.
     application: A string containing the name of the application
-        on behalf of whom the Prowl client will be sending
-        messages.
+        on behalf of whom the client will be sending messages.
 
 </pre>
   <dl class="fields">
     <dt>Overrides:
         object.__init__
     </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="add_key"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">add_key</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">apikey</span>,
+        <span class="sig-arg">device_key</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.add_key">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Add the given key to self.apikeys.
+
+Args:
+    apikey: A string containing a valid user's API key for the
+        client's application.
+    device_key: A string containing a valid device key to go
+        along with the API key. (default: '')
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="del_key"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">del_key</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">apikey</span>,
+        <span class="sig-arg">device_key</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.del_key">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Delete the given API key or device key from self.apikeys.
+
+If device_key is not set, delete apikey and all of its device
+keys. Otherwise only delete the device key.
+
+Args:
+    apikey: A string containing a valid user's API key that is
+        in self.apikeys.
+    device_key: A string containing a valid device key that is
+        in self.apikeys[apikey]. (default: '')
+
+</pre>
+  <dl class="fields">
   </dl>
 </td></tr></table>
 </div>
@@ -351,28 +465,27 @@ Args:
         <span class="sig-arg">kwargs</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.notify">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.notify">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
   <pre class="literalblock">
-Send a notification to each user's apikey in self.apikeys.
+Send a notification to each user/device combination in
+self.apikeys.
 
 Args:
-    description: A string of up to DESC_LIMIT characters
-        containing the notification text.
-    event: A string of up to 1024 characters containing a
-        subject or brief description of the event.
+    description: A string containing the main notification text.
+        The maximum length varies by application. See each
+        client's documentation for details.
+    event: A string containing a subject or brief description of
+        the event. The maximum length varies by application. See
+        each client's documentation for details.
     split: A boolean indicating whether to split long
         descriptions among multiple notifications (True) or to
-        possibly raise an exception (False). (default True)
-    kwargs: A dictionary with any of the following strings as
-            keys:
-        priority: An integer between -2 and 2, indicating the
-            priority of the notification. -2 is the lowest, 2 is
-            the highest, and 0 is normal.
-        url: A string of up to 512 characters containing a URL
-            to attach to the notification.
+        raise an exception if it is too long (False).
+        (default True)
+    kwargs: A dictionary for application specific options. See
+        each client's documentation for details.
         (default: None)
 
 Raises:
@@ -385,86 +498,41 @@ Raises:
 
 </pre>
   <dl class="fields">
-    <dt>Overrides:
-        <a href="pushnotify.abstract.AbstractClient-class.html#notify">abstract.AbstractClient.notify</a>
-    </dt>
   </dl>
 </td></tr></table>
 </div>
-<a name="retrieve_apikey"></a>
+<a name="verify_device"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">retrieve_apikey</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">reg_token</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">verify_device</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">apikey</span>,
+        <span class="sig-arg">device_key</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.retrieve_apikey">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.verify_device">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
   <pre class="literalblock">
-Get a user's API key for a given registration token.
-
-Once a user has approved you sending them push notifications,
-you can supply the returned token here and get an API key.
+Verify a device identifier for the user given by apikey.
 
 Args:
-    reg_token: A string containing a registration token returned
-        from the retrieve_token method.
+    apikey: A string containing a user identifer.
+    device_key: A string containing a device identifier.
 
 Raises:
-    pushnotify.exceptions.ProviderKeyError
+    pushnotify.exceptions.ApiKeyError
 
 Returns:
-    A string containing the API key.
+    A boolean containing True if device_key is valid for
+    apikey, and False if it is not.
 
 </pre>
   <dl class="fields">
-    <dt>Overrides:
-        <a href="pushnotify.abstract.AbstractClient-class.html#retrieve_apikey">abstract.AbstractClient.retrieve_apikey</a>
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
-<a name="retrieve_token"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">retrieve_token</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.retrieve_token">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <pre class="literalblock">
-Get a registration token and approval URL.
-
-A user follows the approval URL and logs in to the Prowl website
-to approve you sending them push notifications. If you have
-associated a 'Retrieve success URL' with your provider key, they
-will be redirected there.
-
-Raises:
-    pushnotify.exceptions.ProviderKeyError
-
-Returns:
-    A two-item tuple where the first item is a string containing
-    a registration token, and the second item is a string
-    containing the associated URL.
-
-</pre>
-  <dl class="fields">
-    <dt>Overrides:
-        <a href="pushnotify.abstract.AbstractClient-class.html#retrieve_token">abstract.AbstractClient.retrieve_token</a>
-    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -479,7 +547,7 @@ Returns:
         <span class="sig-arg">apikey</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="pushnotify.prowl-pysrc.html#Client.verify_user">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="pushnotify.abstract-pysrc.html#AbstractClient.verify_user">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -487,8 +555,7 @@ Returns:
 Verify a user's API key.
 
 Args:
-    apikey: A string of 40 characters containing a user's API
-        key.
+    apikey: A string containing a user's API key.
 
 Raises:
     pushnotify.exceptions.RateLimitExceeded
@@ -502,9 +569,6 @@ Returns:
 
 </pre>
   <dl class="fields">
-    <dt>Overrides:
-        <a href="pushnotify.abstract.AbstractClient-class.html#verify_user">abstract.AbstractClient.verify_user</a>
-    </dt>
   </dl>
 </td></tr></table>
 </div>

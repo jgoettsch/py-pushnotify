@@ -1,12 +1,26 @@
 #!/usr/bin/env python
-# vim: set fileencoding=utf-8
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2013 Jeffrey Goettsch and other contributors.
+#
+# This file is part of py-pushnotify.
+#
+# py-pushnotify is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# py-pushnotify is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with py-pushnotify.  If not, see <http://www.gnu.org/licenses/>.
 
 """Module for sending push notifications to iOS devices that have
 Prowl installed. See http://www.prowlapp.com/ for more
 information.
-
-copyright: Copyright (c) Jeffrey Goettsch and other contributors.
-license: BSD, see LICENSE for details.
 
 """
 
@@ -65,9 +79,9 @@ class Client(abstract.AbstractClient):
                       'retrieve_token': RETRIEVE_TOKEN_URL,
                       'retrieve_apikey': RETRIEVE_APIKEY_URL}
 
-    def _parse_response_stream(self, response_stream, verify=False):
+    def _parse_response(self, response, verify=False):
 
-        xmlresp = response_stream.read()
+        xmlresp = response.text
         self.logger.info('received response: {0}'.format(xmlresp))
 
         root = ElementTree.fromstring(xmlresp)
@@ -175,8 +189,8 @@ class Client(abstract.AbstractClient):
             if kwargs:
                 data.update(kwargs)
 
-            response_stream = self._post(self._urls['notify'], data)
-            self._parse_response_stream(response_stream)
+            response = self._post(self._urls['notify'], data)
+            self._parse_response(response)
 
         if not self.apikeys:
             self.logger.warn('notify called with no users set')
@@ -211,8 +225,8 @@ class Client(abstract.AbstractClient):
         data = {'providerkey': self.developerkey,
                 'token': reg_token}
 
-        response_stream = self._get(self._urls['retrieve_apikey'], data)
-        self._parse_response_stream(response_stream)
+        response = self._get(self._urls['retrieve_apikey'], data)
+        self._parse_response(response)
 
         return self._last['apikey']
 
@@ -235,8 +249,8 @@ class Client(abstract.AbstractClient):
 
         data = {'providerkey': self.developerkey}
 
-        response_stream = self._get(self._urls['retrieve_token'], data)
-        self._parse_response_stream(response_stream)
+        response = self._get(self._urls['retrieve_token'], data)
+        self._parse_response(response)
 
         return self._last['token'], self._last['token_url']
 
@@ -264,8 +278,8 @@ class Client(abstract.AbstractClient):
         if self.developerkey:
             data['providerkey'] = self.developerkey
 
-        response_stream = self._get(self._urls['verify'], data)
-        self._parse_response_stream(response_stream, True)
+        response = self._get(self._urls['verify'], data)
+        self._parse_response(response, True)
 
         return self._last['code'] == '200'
 

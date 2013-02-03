@@ -1,12 +1,26 @@
 #!/usr/bin/env python
-# vim: set fileencoding=utf-8
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2013 Jeffrey Goettsch and other contributors.
+#
+# This file is part of py-pushnotify.
+#
+# py-pushnotify is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# py-pushnotify is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with py-pushnotify.  If not, see <http://www.gnu.org/licenses/>.
 
 """Module for sending push notifications to Android devices that have
 Notify My Android installed. See www.notifymyandroid.com/ for more
 information.
-
-copyright: Copyright (c) Jeffrey Goettsch and other contributors.
-license: BSD, see LICENSE for details.
 
 """
 
@@ -62,9 +76,9 @@ class Client(abstract.AbstractClient):
         self._type = 'nma'
         self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
-    def _parse_response_stream(self, response_stream, verify=False):
+    def _parse_response(self, response, verify=False):
 
-        xmlresp = response_stream.read()
+        xmlresp = response.text
         root = ElementTree.fromstring(xmlresp)
 
         self._last['type'] = root[0].tag.lower()
@@ -151,8 +165,8 @@ class Client(abstract.AbstractClient):
             if kwargs:
                 data.update(kwargs)
 
-            response_stream = self._post(self._urls['notify'], data)
-            self._parse_response_stream(response_stream)
+            response = self._post(self._urls['notify'], data)
+            self._parse_response(response)
 
         if not self.apikeys:
             self.logger.warn('notify called with no users set')
@@ -201,8 +215,8 @@ class Client(abstract.AbstractClient):
         if self.developerkey:
             data['developerkey'] = self.developerkey
 
-        response_stream = self._get(self._urls['verify'], data)
-        self._parse_response_stream(response_stream, True)
+        response = self._get(self._urls['verify'], data)
+        self._parse_response(response, True)
 
         return self._last['code'] == '200'
 

@@ -2,11 +2,11 @@ clean:
 	rm -rf dist/* build/* Manifest
 
 test:
-	nosetests --with-coverage --cover-package=pushnotify pushnotify/tests/tests.py
+	python setup.py nosetests
 
 .PHONY: docs
 docs:
-	epydoc --name pushnotify --url https://bitbucket.org/jgoettsch/py-pushnotify/ --docformat plaintext --exclude .*keys --exclude abstract --html pushnotify -o docs
+	epydoc --name pushnotify --url https://bitbucket.org/jgoettsch/py-pushnotify/ --docformat plaintext --exclude .*keys --html pushnotify -o docs
 	hg add docs
 
 upload_docs: docs
