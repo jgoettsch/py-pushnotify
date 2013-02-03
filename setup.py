@@ -17,37 +17,19 @@
 # along with py-pushnotify.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
 import re
 from setuptools import setup
 
-from pushnotify import __version__
 
-
-def parse_requirements(file_name):
-
-    requirements = []
-    for line in open(file_name, 'r').read().split('\n'):
-        if re.match(r'(\s*#)|(\s*$)', line):
-            continue
-        if re.match(r'\s*-e\s+', line):
-            requirements.append(re.sub(r'\s*-e\s+.*#egg=(.*))$', r'\1', line))
-        elif re.match(r'\s*-f\s+', line):
-            pass
-        else:
-            requirements.append(line)
-
-    return requirements
-
-
-def parse_dependency_links(file_name):
-
-    dependency_links = []
-    for line in open(file_name, 'r').read().split('\n'):
-        if re.match(r'\s*-[ef]\s+', line):
-            dependency_links.append(re.sub(r'\s*-[ef]\s+', '', line))
-
-    return dependency_links
-
+versionfile = os.path.join('pushnotify', '_version.py')
+versionline = open(versionfile, 'r').read()
+versionline_re = r'^__version__ = [\'"]([^\'"]*)[\'"]'
+match = re.search(versionline_re, versionline, re.M)
+if match:
+    __version__ = match.group(1)
+else:
+    raise RuntimeError('Version string not found in pushnotify.')
 
 with open('README.rst') as fh:
     long_description = fh.read()
@@ -62,10 +44,10 @@ setup(
     name='pushnotify',
     packages=['pushnotify', 'pushnotify.tests'],
     version=__version__,
-    install_requires=parse_requirements('requirements.txt'),
-    dependency_links=parse_dependency_links('requirements.txt'),
+    install_requires=['requests==1.1.0'],
 
     # PyPI metadata
+
     author='Jeffrey Goettsch',
     author_email='jgoettsch+pypushnotify@gmail.com',
     classifiers=[
