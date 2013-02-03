@@ -1,5 +1,5 @@
-coverage==3.5.2
-distribute==0.6.28
+coverage==3.6
+distribute==0.6.24
 epydoc==3.0.1
-hghooks==0.5.2
-nose==1.1.2
+hghooks==0.5.4
+nose==1.2.1

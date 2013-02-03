@@ -1,17 +1,30 @@
 #!/usr/bin/env python
-# vim: set fileencoding=utf-8
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2013 Jeffrey Goettsch and other contributors.
+#
+# This file is part of py-pushnotify.
+#
+# py-pushnotify is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# py-pushnotify is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with py-pushnotify.  If not, see <http://www.gnu.org/licenses/>.
 
 """Module for sending push notificiations to Android and iOS devices
 that have Pushover installed. See https://pushover.net/ for more
 information.
 
-copyright: Copyright (c) Jeffrey Goettsch and other contributors.
-license: BSD, see LICENSE for details.
-
 """
 
 
-import json
 import time
 
 from pushnotify import abstract
@@ -58,34 +71,17 @@ class Client(abstract.AbstractClient):
         self._type = 'pushover'
         self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
 
-    def _parse_response_stream(self, stream, verify=False):
+    def _parse_response(self, stream, verify=False):
 
-        response = stream.read()
+        response = stream.json()
         self.logger.info('received response: {0}'.format(response))
 
-        response = json.loads(response)
-
-        self._last['code'] = stream.code
-        if 'device' in response.keys():
-            self._last['device'] = response['device']
-        else:
-            self._last['device'] = None
-        if 'errors' in response.keys():
-            self._last['errors'] = response['errors']
-        else:
-            self._last['errors'] = None
-        if 'status' in response.keys():
-            self._last['status'] = response['status']
-        else:
-            self._last['status'] = None
-        if 'token' in response.keys():
-            self._last['token'] = response['token']
-        else:
-            self._last['token'] = None
-        if 'user' in response.keys():
-            self._last['user'] = response['user']
-        else:
-            self._last['user'] = None
+        self._last['code'] = stream.status_code
+        self._last['device'] = response.get('device', None)
+        self._last['errors'] = response.get('errors', None)
+        self._last['status'] = response.get('status', None)
+        self._last['token'] = response.get('token', None)
+        self._last['user'] = response.get('user', None)
 
         return self._last['status']
 
@@ -94,8 +90,8 @@ class Client(abstract.AbstractClient):
         msg = ''
         if self._last['errors']:
             messages = []
-            for key, value in self._last['errors'].items():
-                messages.append('{0} {1}'.format(key, value[0]))
+            for error in self._last['errors']:
+                messages.append(error)
             msg = '; '.join(messages)
 
         if self._last['device'] and 'invalid' in self._last['device']:
@@ -174,8 +170,8 @@ class Client(abstract.AbstractClient):
                 if kwargs:
                     data.update(kwargs)
 
-                response_stream = self._post(self._urls['notify'], data)
-                this_successful = self._parse_response_stream(response_stream)
+                response = self._post(self._urls['notify'], data)
+                this_successful = self._parse_response(response)
 
                 all_successful = all_successful and this_successful
 
@@ -201,8 +197,7 @@ class Client(abstract.AbstractClient):
 
         for apikey, device_keys in self.apikeys.items():
             if not device_keys:
-                this_ok = send_notify(desc_list, event, kwargs,
-                                                   apikey)
+                this_ok = send_notify(desc_list, event, kwargs, apikey)
             else:
                 for device_key in device_keys:
                     this_ok = send_notify(
@@ -227,9 +222,9 @@ class Client(abstract.AbstractClient):
 
         data = {'token': self.developerkey, 'user': apikey}
 
-        response_stream = self._post(self._urls['verify'], data)
+        response = self._post(self._urls['verify'], data)
 
-        self._parse_response_stream(response_stream, True)
+        self._parse_response(response, True)
 
         return self._last['status']
 
@@ -252,9 +247,9 @@ class Client(abstract.AbstractClient):
         data = {'token': self.developerkey, 'user': apikey,
                 'device': device_key}
 
-        response_stream = self._post(self._urls['verify'], data)
+        response = self._post(self._urls['verify'], data)
 
-        self._parse_response_stream(response_stream, True)
+        self._parse_response(response, True)
 
         if self._last['user'] and 'invalid' in self._last['user'].lower():
             self._raise_exception()
