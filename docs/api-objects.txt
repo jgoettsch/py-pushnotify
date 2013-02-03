@@ -2,6 +2,8 @@ pushnotify	pushnotify-module.html
 pushnotify.__package__	pushnotify-module.html#__package__
 pushnotify.logger	pushnotify-module.html#logger
 pushnotify.get_client	pushnotify-module.html#get_client
+pushnotify._version	pushnotify._version-module.html
+pushnotify._version.__package__	pushnotify._version-module.html#__package__
 pushnotify.abstract	pushnotify.abstract-module.html
 pushnotify.abstract.__package__	pushnotify.abstract-module.html#__package__
 pushnotify.exceptions	pushnotify.exceptions-module.html

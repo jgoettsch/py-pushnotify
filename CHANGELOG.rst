@@ -10,7 +10,7 @@ version 0.5.1
 * **license-change:** this and future versions are now licensed under
   the GNU GPL v3.
 
-* now uses the Requests instead of urllib2
+* now uses the Requests package instead of urllib2
 
 version 0.5
 

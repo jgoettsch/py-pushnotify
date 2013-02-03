@@ -2,7 +2,7 @@ clean:
 	rm -rf dist/* build/* Manifest
 
 test:
-	nosetests --with-coverage --cover-package=pushnotify pushnotify/tests/tests.py
+	python setup.py nosetests
 
 .PHONY: docs
 docs:

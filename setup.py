@@ -3,6 +3,8 @@
 #
 # Copyright (C) 2013 Jeffrey Goettsch and other contributors.
 #
+# This file is part of py-pushnotify.
+#
 # py-pushnotify is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -45,6 +47,10 @@ setup(
     packages=['pushnotify', 'pushnotify.tests'],
     version=__version__,
     install_requires=['requests==1.1.0'],
+    test_suite='nose.collector',
+    tests_require=[
+        'coverage',
+        'nose'],
 
     # PyPI metadata
 
