@@ -18,12 +18,11 @@
 
 import logging
 
+from _version import __version__
 import nma
 import prowl
 import pushover
 
-
-__version__ = '0.5p'
 
 logger = logging.getLogger(__package__)
 
