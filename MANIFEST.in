@@ -1,7 +1,7 @@
 include AUTHORS.rst
 include CHANGELOG.rst
 include INSTALL.rst
-include LICENSE.rst
+include COPYING.rst
 include README.rst
 include TODO.rst
 recursive-include docs *
