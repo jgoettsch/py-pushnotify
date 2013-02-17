@@ -1,7 +1,12 @@
+Copying
+=======
+
+py-pushnotify is licensed under the GNU General Public License:
+
 .. _gpl:
 
 GNU General Public License
-==========================
+--------------------------
 
 ::
 

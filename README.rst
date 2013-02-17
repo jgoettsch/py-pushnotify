@@ -1,7 +1,3 @@
-==========
-pushnotify
-==========
-
 pushnotify is a package for sending push notifications. It currently
 supports Android devices running Notify My Android and Pushover, and iOS
 devices running Pushover and Prowl.
@@ -15,7 +11,7 @@ See
 for more details about these applications.
 
 Development
------------
+===========
 
 All development for pushnotify takes place on bitbucket:
 

@@ -1,5 +1,5 @@
 Installation
-------------
+============
 
 If you have already downloaded pushnotify, run the following
 command inside this directory::
