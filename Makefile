@@ -4,14 +4,6 @@ clean:
 test:
 	python setup.py nosetests
 
-.PHONY: docs
-docs:
-	epydoc --name pushnotify --url https://bitbucket.org/jgoettsch/py-pushnotify/ --docformat plaintext --exclude .*keys --html pushnotify -o docs
-	hg add docs
-
-upload_docs: docs
-	python setup.py upload_docs --upload-dir=docs
-
 check:
 	python setup.py check
 
