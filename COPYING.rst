@@ -1,5 +1,5 @@
-Copying
-=======
+Copying py-pushnotify's Source Code
+===================================
 
 py-pushnotify is licensed under the GNU General Public License:
 
