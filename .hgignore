@@ -7,6 +7,7 @@ syntax: regexp
 ^pushnotify/tests/pushoverkeys.py
 
 syntax: glob
+*.bak
 *.egg-info
 *.orig
 *.pyc
