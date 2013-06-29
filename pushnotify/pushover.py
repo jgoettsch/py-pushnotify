@@ -34,6 +34,7 @@ from pushnotify import exceptions
 PUBLIC_API_URL = u'https://api.pushover.net/1'
 VERIFY_URL = u'/'.join([PUBLIC_API_URL, u'users/validate.json'])
 NOTIFY_URL = u'/'.join([PUBLIC_API_URL, u'messages.json'])
+SOUND_URL = u'/'.join([PUBLIC_API_URL, u'sounds.json'])
 
 DESC_LIMIT = 512
 
@@ -69,7 +70,9 @@ class Client(abstract.AbstractClient):
         super(self.__class__, self).__init__(developerkey, application)
 
         self._type = 'pushover'
-        self._urls = {'notify': NOTIFY_URL, 'verify': VERIFY_URL}
+        self._urls = {'notify': NOTIFY_URL,
+                      'verify': VERIFY_URL,
+                      'sounds': SOUND_URL}
 
     def _parse_response(self, stream, verify=False):
 
@@ -82,6 +85,7 @@ class Client(abstract.AbstractClient):
         self._last['status'] = response.get('status', None)
         self._last['token'] = response.get('token', None)
         self._last['user'] = response.get('user', None)
+        self._last['sounds'] = response.get('sounds', None)
 
         return self._last['status']
 
@@ -256,6 +260,17 @@ class Client(abstract.AbstractClient):
 
         return self._last['status']
 
+    def sounds(self):
+        """ Retrieve available sounds list.
+
+        Returns:
+            A hash with each key being the actual sound parameter to store for the user
+            and send to Pushover, with its value describing the sound.
+        """
+        response = self._get(self._urls['sounds'],
+                             {'token': self.developerkey})
+        self._parse_response(response, True)
+        return self._last['sounds']
 
 if __name__ == '__main__':
     pass
