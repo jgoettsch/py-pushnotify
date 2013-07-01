@@ -489,10 +489,10 @@ class PushoverTest(unittest.TestCase):
         self.assertRaises(exceptions.ApiKeyError, self.client.verify_device,
                           'foo', device_key)
 
-    def test_sound(self):
+    def test_get_sounds(self):
         """ Test retrieve sounds list from pushover
         """
-        sounds = self.client.sounds()
+        sounds = self.client.get_sounds()
         self.assertGreater(len(sounds.keys()), 0)
 
 if __name__ == '__main__':

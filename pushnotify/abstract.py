@@ -201,3 +201,12 @@ class AbstractClient(object):
         """
 
         raise NotImplementedError
+
+    def get_sounds(self):
+        """ Retrieve available sounds list.
+
+        Returns:
+            A dictionary with each key being the actual sound parameter to store for the user
+            and send back with notify request, with its value describing the sound.
+        """
+        raise NotImplementedError

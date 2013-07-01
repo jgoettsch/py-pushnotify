@@ -260,11 +260,11 @@ class Client(abstract.AbstractClient):
 
         return self._last['status']
 
-    def sounds(self):
+    def get_sounds(self):
         """ Retrieve available sounds list.
 
         Returns:
-            A hash with each key being the actual sound parameter to store for the user
+            A dictionary with each key being the actual sound parameter to store for the user
             and send to Pushover, with its value describing the sound.
         """
         response = self._get(self._urls['sounds'],
