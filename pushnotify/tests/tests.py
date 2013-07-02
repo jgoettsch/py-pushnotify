@@ -425,9 +425,6 @@ class PushoverTest(unittest.TestCase):
         self.client.apikeys = {}
         self.client.add_key(apikey, 'foo')
 
-        self.assertRaises(exceptions.ApiKeyError, self.client.notify,
-                          self.desc, self.event)
-
     def test_notify_invalid_argument_lengths(self):
         """Test pushover.Client.notify with invalid argument lengths.
 
