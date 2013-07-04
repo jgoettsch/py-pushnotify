@@ -378,7 +378,8 @@ class PushoverTest(unittest.TestCase):
 
         self.client.notify(self.desc, self.event, split=False,
                            kwargs={'priority': 1, 'url': 'http://google.com/',
-                                   'url_title': 'Google'})
+                                   'url_title': 'Google',
+                                   'sound': 'classical'})
 
     def test_notify_valid_split(self):
         """Test pushover.Client.notify with a valid notification,

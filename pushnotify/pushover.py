@@ -147,6 +147,8 @@ class Client(abstract.AbstractClient):
                     to attach to the notification.
                 url_title: A string of up to 50 characters containing a
                     title to give the attached URL.
+                sound: A string containing a valid sound returned from
+                    get_sounds().
                 (default: None)
 
         Raises:
