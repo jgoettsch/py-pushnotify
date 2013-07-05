@@ -143,6 +143,12 @@ class Client(abstract.AbstractClient):
                 priority: An integer between -1 and 2, indicating low (-1),
                     normal (0), high (1), or emergency (2) priority.
                     (see: https://pushover.net/api#priority)
+                retry: An integer specifying how often, in seconds, to resend
+                    the notification until acknowledged. Must be 30 or
+                    greater. Requires a priority value of 2.
+                expire: An integer specifying when, in seconds, to stop
+                    resending the notification. Must be 86400 or less.
+                    Requires a priority value of 2.
                 url: A string of up to 500 characters containing a URL
                     to attach to the notification.
                 url_title: A string of up to 50 characters containing a
