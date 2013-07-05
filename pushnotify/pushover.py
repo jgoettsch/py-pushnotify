@@ -140,9 +140,9 @@ class Client(abstract.AbstractClient):
                 possibly raise an exception (False). (default True)
             kwargs: A dictionary with any of the following strings as
                     keys:
-                priority: The integer 1, which will make the
-                    notification display in red and override any set
-                    quiet hours.
+                priority: An integer between -1 and 2, indicating low (-1),
+                    normal (0), high (1), or emergency (2) priority.
+                    (see: https://pushover.net/api#priority)
                 url: A string of up to 500 characters containing a URL
                     to attach to the notification.
                 url_title: A string of up to 50 characters containing a
