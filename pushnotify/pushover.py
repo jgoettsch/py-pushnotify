@@ -86,6 +86,7 @@ class Client(abstract.AbstractClient):
         self._last['token'] = response.get('token', None)
         self._last['user'] = response.get('user', None)
         self._last['sounds'] = response.get('sounds', None)
+        self._last['receipt'] = response.get('receipt', None)
 
         return self._last['status']
 
