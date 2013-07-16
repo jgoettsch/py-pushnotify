@@ -151,6 +151,9 @@ class Client(abstract.AbstractClient):
             pushnotify.exceptions.UnknownError
             pushnotify.exceptions.UnrecognizedResponseError
 
+        Returns:
+            True.
+
         """
 
         def send_notify(description, event, kwargs):
@@ -179,6 +182,8 @@ class Client(abstract.AbstractClient):
                 send_notify(this_desc, event, kwargs)
         else:
             send_notify(description, event, kwargs)
+
+        return True
 
     def verify(self, apikey):
         """This method is deprecated. Use verify_user instead.

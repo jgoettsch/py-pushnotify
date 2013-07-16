@@ -165,6 +165,10 @@ class Client(abstract.AbstractClient):
             pushnotify.exceptions.ServerError
             pushnotify.exceptions.UnrecognizedResponseError
 
+        Returns:
+            A string containing the last receipt received, if priority
+            was sent to 2, otherwise True.
+
         """
 
         def send_notify(desc_list, event, kwargs, apikey, device_key=''):
@@ -220,6 +224,8 @@ class Client(abstract.AbstractClient):
 
         if not all_ok:
             self._raise_exception()
+
+        return self._last['receipt'] if self._last['receipt'] else True
 
     def verify_user(self, apikey):
         """Verify a user identifier.
