@@ -175,6 +175,9 @@ class Client(abstract.AbstractClient):
             pushnotify.exceptions.UnknownError
             pushnotify.exceptions.UnrecognizedResponseError
 
+        Returns:
+            True.
+
         """
 
         def send_notify(description, event, kwargs):
@@ -203,6 +206,8 @@ class Client(abstract.AbstractClient):
                 send_notify(this_desc, event, kwargs)
         else:
             send_notify(description, event, kwargs)
+
+        return True
 
     def retrieve_apikey(self, reg_token):
         """Get a user's API key for a given registration token.
