@@ -70,24 +70,14 @@ class AbstractClient(object):
 
         self.logger.debug('_get requesting url: {0}'.format(url))
 
-        try:
-            response = self._browser.get(url, params=data)
-        except requests.exceptions.RequestException, exc:
-            return exc
-        else:
-            return response
+        return self._browser.get(url, params=data)
 
     def _post(self, url, data):
 
         self.logger.debug('_post sending data: {0}'.format(data))
         self.logger.debug('_post sending to url: {0}'.format(url))
 
-        try:
-            response = self._browser.post(url, data=data)
-        except requests.exceptions.RequestException, exc:
-            return exc
-        else:
-            return response
+        return self._browser.post(url, data=data)
 
     def add_key(self, apikey, device_key=''):
         """Add the given key to self.apikeys.
