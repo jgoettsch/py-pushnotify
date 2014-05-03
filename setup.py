@@ -46,7 +46,7 @@ setup(
     name='pushnotify',
     packages=['pushnotify', 'pushnotify.tests'],
     version=__version__,
-    install_requires=['requests==1.1.0'],
+    install_requires=['requests>=2.0'],
     test_suite='nose.collector',
     tests_require=[
         'coverage',
